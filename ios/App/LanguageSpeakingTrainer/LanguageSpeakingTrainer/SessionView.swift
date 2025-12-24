@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SessionView: View {
     let topic: Topic
+    let modelPreference: RealtimeModelPreference
 
     @Environment(\.dismiss) private var dismiss
 
@@ -10,9 +11,12 @@ struct SessionView: View {
 
     @State private var isMuted: Bool = false
 
-    init(topic: Topic) {
+    init(topic: Topic, modelPreference: RealtimeModelPreference) {
         self.topic = topic
-        _sessionModel = StateObject(wrappedValue: SessionModel(client: RealtimeClientFactory.makeClient()))
+        self.modelPreference = modelPreference
+        _sessionModel = StateObject(wrappedValue: SessionModel(
+            client: RealtimeClientFactory.makeClient(modelPreference: modelPreference)
+        ))
     }
 
     var body: some View {

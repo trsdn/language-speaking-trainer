@@ -28,7 +28,10 @@ extension TokenServiceError: LocalizedError {
 }
 
 enum TokenService {
-    static func fetchEphemeralToken(topic: Topic?) async throws -> EphemeralTokenResponse {
+    static func fetchEphemeralToken(
+        topic: Topic?,
+        mode: RealtimeModelPreference = .realtimeMini
+    ) async throws -> EphemeralTokenResponse {
         guard let base = AppConfig.tokenServiceBaseURL else {
             throw TokenServiceError.missingBaseURL
         }
@@ -42,11 +45,13 @@ enum TokenService {
             .appendingPathComponent("token")
 
         var components = URLComponents(url: tokenURL, resolvingAgainstBaseURL: false)
+        var queryItems: [URLQueryItem] = [
+            URLQueryItem(name: "mode", value: mode.rawValue)
+        ]
         if let topic {
-            components?.queryItems = [
-                URLQueryItem(name: "topic", value: topic.title)
-            ]
+            queryItems.append(URLQueryItem(name: "topic", value: topic.title))
         }
+        components?.queryItems = queryItems
         guard let url = components?.url else { throw TokenServiceError.invalidResponse }
 
         var req = URLRequest(url: url)

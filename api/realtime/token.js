@@ -19,6 +19,24 @@ function clampTopic(raw) {
   return t.slice(0, 60);
 }
 
+function normalizeMode(raw) {
+  if (typeof raw !== "string") return "realtimeMini";
+  const v = raw.trim();
+  if (!v) return "realtimeMini";
+  return v;
+}
+
+function resolveRealtimeModelId(mode) {
+  // NOTE: Keep this mapping explicit and server-side so the client can only
+  // choose among approved modes.
+  const realtime = (process.env.REALTIME_MODEL_ID || "gpt-realtime").trim() || "gpt-realtime";
+  const realtimeMini =
+    (process.env.REALTIME_MINI_MODEL_ID || "gpt-realtime-mini").trim() || "gpt-realtime-mini";
+
+  if (mode === "realtime") return realtime;
+  return realtimeMini;
+}
+
 // Very small, dependency-free rate limiter.
 // Note: On serverless, this is per-instance (best-effort), not a global guarantee.
 const _rlState = {
@@ -81,6 +99,15 @@ module.exports = async function handler(req, res) {
 
   const voice = (process.env.REALTIME_VOICE || "alloy").trim() || "alloy";
 
+  const requestedMode = normalizeMode(req.query?.mode);
+  const allowedModes = new Set(["realtimeMini", "realtime"]);
+  if (!allowedModes.has(requestedMode)) {
+    res.status(400).json({ error: "Invalid mode", allowed: Array.from(allowedModes) });
+    return;
+  }
+
+  const modelId = resolveRealtimeModelId(requestedMode);
+
   const topic = clampTopic(req.query?.topic);
   const instructions = topic
     ? `${SYSTEM_INSTRUCTIONS}\n\nSelected topic: ${topic}`
@@ -93,7 +120,7 @@ module.exports = async function handler(req, res) {
     },
     session: {
       type: "realtime",
-      model: "gpt-realtime",
+      model: modelId,
       instructions,
       audio: {
         output: {

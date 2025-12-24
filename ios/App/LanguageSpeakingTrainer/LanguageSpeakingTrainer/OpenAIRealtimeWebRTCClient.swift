@@ -11,10 +11,15 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
 
     private var stopped = false
     private var isMuted = false
+    private let modelPreference: RealtimeModelPreference
 
     #if canImport(WebRTC)
     private var session: OpenAIWebRTCSession?
     #endif
+
+    init(modelPreference: RealtimeModelPreference = .realtimeMini) {
+        self.modelPreference = modelPreference
+    }
 
     func start(topic: Topic, onEvent: @escaping (RealtimeEvent) -> Void) {
         stopped = false
@@ -29,7 +34,7 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
                 }
                 #endif
 
-                let token = try await TokenService.fetchEphemeralToken(topic: topic)
+                let token = try await TokenService.fetchEphemeralToken(topic: topic, mode: modelPreference)
                 guard !stopped else { return }
 
                 #if canImport(WebRTC)
