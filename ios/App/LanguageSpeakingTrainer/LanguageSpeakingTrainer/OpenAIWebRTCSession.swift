@@ -395,7 +395,8 @@ private extension AVAudioSession.Port {
              .bluetoothLE,
              .airPlay,
              .carAudio,
-             .usbAudio:
+             .usbAudio,
+             .HDMI:
             return true
         default:
             return false
