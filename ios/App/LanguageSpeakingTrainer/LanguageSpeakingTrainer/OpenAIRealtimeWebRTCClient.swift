@@ -12,13 +12,15 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
     private var stopped = false
     private var isMuted = false
     private let modelPreference: RealtimeModelPreference
+    private let learnerContext: LearnerContext
 
     #if canImport(WebRTC)
     private var session: OpenAIWebRTCSession?
     #endif
 
-    init(modelPreference: RealtimeModelPreference = .realtimeMini) {
+    init(modelPreference: RealtimeModelPreference = .realtimeMini, learnerContext: LearnerContext) {
         self.modelPreference = modelPreference
+        self.learnerContext = learnerContext
     }
 
     func start(topic: Topic, onEvent: @escaping (RealtimeEvent) -> Void) {
@@ -41,6 +43,7 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
                 let s = OpenAIWebRTCSession(
                     ephemeralKey: token.value,
                     topic: topic,
+                    learnerContext: learnerContext,
                     isMuted: isMuted,
                     onEvent: onEvent
                 )
