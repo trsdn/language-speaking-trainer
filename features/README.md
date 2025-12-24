@@ -2,6 +2,8 @@
 
 This folder contains product-level acceptance criteria written in BDD/Gherkin so they can be used later for automated testing.
 
+Quick overview of what’s implemented: see `features/FEATURE_REGISTRY.md`.
+
 ## Structure
 
 The structure mirrors the style:

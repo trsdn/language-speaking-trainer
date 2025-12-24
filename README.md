@@ -8,6 +8,8 @@ Native iOS (SwiftUI) app for a kids-friendly English speaking trainer.
 - `ios/` — native iOS implementation scaffold (SwiftUI).
 - `api/` — Vercel serverless functions (ephemeral token minting).
 
+See `features/FEATURE_REGISTRY.md` for a single place that tracks what’s specified vs implemented.
+
 ## iOS app status
 
 Implemented UI flows matching MVP BDD:

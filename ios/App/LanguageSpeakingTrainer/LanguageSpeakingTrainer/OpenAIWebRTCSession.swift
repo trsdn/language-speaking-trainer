@@ -29,6 +29,8 @@ final class OpenAIWebRTCSession: NSObject {
     private var isStopped = false
     private var isMuted: Bool
 
+    private var routeChangeObserver: NSObjectProtocol?
+
     // Accumulate text deltas into a single message (best-effort).
     private var pendingText: String = ""
 
@@ -50,15 +52,7 @@ final class OpenAIWebRTCSession: NSObject {
     func start() {
         onEvent(.systemNote("Starting WebRTC session…"))
 
-        // Configure iOS audio session for WebRTC.
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothHFP])
-            try session.setMode(.voiceChat)
-            try session.setActive(true)
-        } catch {
-            onEvent(.systemNote("Audio session setup warning: \(error.localizedDescription)"))
-        }
+        configureCallAudioSession()
 
         let config = RTCConfiguration()
         config.sdpSemantics = .unifiedPlan
@@ -129,6 +123,18 @@ final class OpenAIWebRTCSession: NSObject {
     func stop() {
         isStopped = true
 
+        if let observer = routeChangeObserver {
+            NotificationCenter.default.removeObserver(observer)
+            routeChangeObserver = nil
+        }
+
+        // Best-effort: deactivate call audio session.
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
+        } catch {
+            // Don't spam UI on teardown.
+        }
+
         dataChannel?.delegate = nil
         dataChannel?.close()
         dataChannel = nil
@@ -140,6 +146,59 @@ final class OpenAIWebRTCSession: NSObject {
         audioSender = nil
 
         onEvent(.systemNote("WebRTC session stopped."))
+    }
+
+    private func configureCallAudioSession() {
+        // Configure iOS audio session for WebRTC.
+        do {
+            let session = AVAudioSession.sharedInstance()
+
+            // Speaker-first unless a headset/external output is connected.
+            // `.defaultToSpeaker` prevents the “earpiece” (receiver) default.
+            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothHFP])
+            try session.setMode(.voiceChat)
+            try session.setActive(true)
+
+            // Enforce speaker when the current route is the built-in receiver.
+            applyPreferredOutputRoute(session: session)
+
+            // Re-apply on route changes (e.g., headphones plugged/unplugged).
+            if routeChangeObserver == nil {
+                routeChangeObserver = NotificationCenter.default.addObserver(
+                    forName: AVAudioSession.routeChangeNotification,
+                    object: session,
+                    queue: .main
+                ) { [weak self] _ in
+                    guard let self else { return }
+                    self.applyPreferredOutputRoute(session: session)
+                }
+            }
+        } catch {
+            onEvent(.systemNote("Audio session setup warning: \(error.localizedDescription)"))
+        }
+    }
+
+    private func applyPreferredOutputRoute(session: AVAudioSession) {
+        let outputs = session.currentRoute.outputs
+
+        // If any external output is connected, do not override the route.
+        if outputs.contains(where: { $0.portType.isExternalOutput }) {
+            do {
+                try session.overrideOutputAudioPort(.none)
+            } catch {
+                // Ignore: override isn't always supported for all routes.
+            }
+            return
+        }
+
+        // If we're currently using the built-in receiver, force speaker.
+        if outputs.contains(where: { $0.portType == .builtInReceiver }) {
+            do {
+                try session.overrideOutputAudioPort(.speaker)
+            } catch {
+                // Ignore: override isn't always supported.
+            }
+        }
     }
 
     func setMuted(_ muted: Bool) {
@@ -324,6 +383,24 @@ extension OpenAIWebRTCSession: RTCDataChannelDelegate {
             return
         }
         handleServerEvent(json)
+    }
+}
+
+private extension AVAudioSession.Port {
+    var isExternalOutput: Bool {
+        switch self {
+        case .headphones,
+             .bluetoothA2DP,
+             .bluetoothHFP,
+             .bluetoothLE,
+             .airPlay,
+             .carAudio,
+             .usbAudio,
+             .HDMI:
+            return true
+        default:
+            return false
+        }
     }
 }
 
