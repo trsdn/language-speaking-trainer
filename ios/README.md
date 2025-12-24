@@ -16,9 +16,11 @@ You need **Xcode** installed (Command Line Tools alone is not enough).
 
 ## How to open
 
-1. Create a new Xcode project (iOS → App) named `LanguageSpeakingTrainer`.
+Open the checked-in Xcode project:
+
+1. Open `ios/App/LanguageSpeakingTrainer/LanguageSpeakingTrainer.xcodeproj` in Xcode.
 2. Set the deployment target to iOS 17+ (recommended).
-3. Copy the Swift files from `ios/LanguageSpeakingTrainer/` into the Xcode target.
+3. Ensure your app target includes the SwiftUI sources under `ios/App/LanguageSpeakingTrainer/LanguageSpeakingTrainer/`.
 4. Ensure your app `Info.plist` contains `NSMicrophoneUsageDescription` (see template below).
 
 Template value suggestion:
@@ -28,6 +30,8 @@ Template value suggestion:
 Optional (for later Realtime token minting):
 
 - `TOKEN_SERVICE_BASE_URL`: `https://your-vercel-app.vercel.app`
+
+Note: there is an older scaffold folder at `ios/LanguageSpeakingTrainer/` from before the `.xcodeproj` existed. The canonical sources going forward are the ones inside the Xcode project folder under `ios/App/...`.
 
 ## Next steps
 

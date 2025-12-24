@@ -22,6 +22,19 @@ Create `.env` (or configure Vercel Project Env Vars):
 - `REALTIME_VOICE` (optional, default `alloy`)
 - `REALTIME_TOKEN_RPM` (optional, default 30) — best-effort per-instance rate limit
 
+## Run locally (Vercel CLI)
+
+If you don't have the `vercel` binary on your PATH, you can still use it via `npx vercel`.
+
+Typical local flow:
+
+1. Ensure `.env` contains a valid `OPENAI_API_KEY` (the token endpoint will return an OpenAI error if it's missing/invalid).
+2. Link the folder to a Vercel project (important if your folder name contains spaces, because Vercel project names must be lowercase and cannot contain spaces):
+  Link to an existing project name like `language-speaking-trainer`.
+3. Start local dev with `vercel dev` and test:
+  `GET http://127.0.0.1:3000/api/health`
+  `GET http://127.0.0.1:3000/api/realtime/token?topic=Space`
+
 ## iOS configuration
 
 In the iOS app `Info.plist`, set:

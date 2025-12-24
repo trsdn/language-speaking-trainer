@@ -6,7 +6,8 @@ This project uses **Swift Package Manager** (SwiftPM) to add a WebRTC SDK to the
 
 Provide a `WebRTC` module so the guarded code path in:
 
-- `ios/LanguageSpeakingTrainer/OpenAIRealtimeWebRTCClient.swift`
+- `ios/App/LanguageSpeakingTrainer/LanguageSpeakingTrainer/OpenAIRealtimeWebRTCClient.swift`
+- `ios/App/LanguageSpeakingTrainer/LanguageSpeakingTrainer/OpenAIWebRTCSession.swift`
 
 can compile and the app can establish a Realtime **WebRTC** connection.
 
@@ -29,6 +30,13 @@ In Xcode:
 4. Add the product that provides the `WebRTC` module to your app target.
 5. Build once to confirm the module is available.
 
+### Package we currently use
+
+- URL: `https://github.com/stasel/WebRTC`
+- Pinned version: `141.0.0` (tag `M141`)
+
+This package ships a prebuilt `WebRTC.xcframework` via SwiftPM so `import WebRTC` works.
+
 ## Candidate packages
 
 Because WebRTC packaging changes over time, prefer a package that:
@@ -43,6 +51,40 @@ Two repositories that have historically shipped WebRTC as a Swift package:
 - `https://github.com/highfidelity/HiFi-WebRTC-iOS`
 
 If the chosen package exports a different module name, we can adjust the guard in code (e.g. `canImport(SomeOtherModule)`).
+
+## Known issue: header path mismatch (workaround in this repo)
+
+On some toolchain/Xcode combinations, the `stasel/WebRTC` binary framework headers may include:
+
+- `#import "sdk/objc/base/RTCMacros.h"`
+
+even though the framework actually ships the file as:
+
+- `WebRTC.framework/Headers/RTCMacros.h`
+
+This causes the build to fail while Swift/Clang tries to build the `WebRTC` module.
+
+### Workaround A (recommended): header shim via `HEADER_SEARCH_PATHS`
+
+On newer Xcode toolchains using explicit module builds / clang dependency scanning, an app-target build phase may not run early enough to affect the dependency scanner.
+
+This repository includes a small header shim at:
+
+- `ios/WebRTCHeaderShim/sdk/objc/base/RTCMacros.h`
+
+And the app target adds this folder to `HEADER_SEARCH_PATHS`.
+
+When WebRTC headers import `"sdk/objc/base/RTCMacros.h"`, the compiler finds the shim (from the header search path), which forwards to:
+
+- `<WebRTC/RTCMacros.h>`
+
+### Workaround B (legacy): copy into built framework headers
+
+This repository also includes an Xcode **Run Script** build phase (in the app target) that creates the expected folder path inside the built framework headers by copying `RTCMacros.h` to:
+
+- `WebRTC.framework/Headers/sdk/objc/base/RTCMacros.h`
+
+If/when upstream fixes the header layout, that script phase can be removed.
 
 ## After WebRTC is available
 
