@@ -1,6 +1,22 @@
 import Foundation
 import Combine
 
+enum RealtimeModelPreference: String, CaseIterable, Codable, Identifiable {
+    case realtimeMini
+    case realtime
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .realtimeMini:
+            return "Realtime Mini"
+        case .realtime:
+            return "Realtime"
+        }
+    }
+}
+
 @MainActor
 final class AppModel: ObservableObject {
     @Published var selectedTopic: Topic? = nil
@@ -8,8 +24,16 @@ final class AppModel: ObservableObject {
     // First-run onboarding state
     @Published var onboarding: OnboardingSettings
 
+    // Settings
+    @Published var realtimeModelPreference: RealtimeModelPreference {
+        didSet {
+            persistRealtimeModelPreference(realtimeModelPreference)
+        }
+    }
+
     init() {
         onboarding = OnboardingSettings.load()
+        realtimeModelPreference = Self.loadRealtimeModelPreference()
     }
 
     func completeOnboarding(ageBand: AgeBand, level: EnglishLevel) {
@@ -19,6 +43,19 @@ final class AppModel: ObservableObject {
 
     func resetTopic() {
         selectedTopic = nil
+    }
+
+    private static let realtimeModelPreferenceKey = "realtime.model.preference.v1"
+
+    private static func loadRealtimeModelPreference() -> RealtimeModelPreference {
+        guard let raw = UserDefaults.standard.string(forKey: realtimeModelPreferenceKey) else {
+            return .realtimeMini
+        }
+        return RealtimeModelPreference(rawValue: raw) ?? .realtimeMini
+    }
+
+    private func persistRealtimeModelPreference(_ pref: RealtimeModelPreference) {
+        UserDefaults.standard.set(pref.rawValue, forKey: Self.realtimeModelPreferenceKey)
     }
 }
 

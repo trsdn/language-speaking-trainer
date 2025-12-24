@@ -30,7 +30,10 @@ struct HomeView: View {
             }
 
             NavigationLink {
-                SessionView(topic: appModel.selectedTopic ?? Topic.presets[0])
+                SessionView(
+                    topic: appModel.selectedTopic ?? Topic.presets[0],
+                    modelPreference: appModel.realtimeModelPreference
+                )
             } label: {
                 Text("Start")
                     .frame(maxWidth: .infinity)
@@ -44,6 +47,18 @@ struct HomeView: View {
             Spacer()
         }
         .padding(.horizontal)
+        .navigationTitle("Home")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    SettingsView()
+                } label: {
+                    Image(systemName: "gearshape")
+                }
+                .accessibilityLabel("Settings")
+            }
+        }
         .onChange(of: appModel.selectedTopic) { _, _ in
             validationMessage = nil
         }
