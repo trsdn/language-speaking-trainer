@@ -160,7 +160,7 @@ final class OpenAIWebRTCSession: NSObject {
             try session.setActive(true)
 
             // Enforce speaker when the current route is the built-in receiver.
-            applyPreferredOutputRoute(session: session)
+            applyPreferredOutputRoute()
 
             // Re-apply on route changes (e.g., headphones plugged/unplugged).
             if routeChangeObserver == nil {
@@ -170,7 +170,7 @@ final class OpenAIWebRTCSession: NSObject {
                     queue: .main
                 ) { [weak self] _ in
                     guard let self else { return }
-                    self.applyPreferredOutputRoute(session: session)
+                    self.applyPreferredOutputRoute()
                 }
             }
         } catch {
@@ -178,7 +178,8 @@ final class OpenAIWebRTCSession: NSObject {
         }
     }
 
-    private func applyPreferredOutputRoute(session: AVAudioSession) {
+    private func applyPreferredOutputRoute() {
+        let session = AVAudioSession.sharedInstance()
         let outputs = session.currentRoute.outputs
 
         // If any external output is connected, do not override the route.
