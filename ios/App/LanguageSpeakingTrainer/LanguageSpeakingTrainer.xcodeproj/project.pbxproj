@@ -308,6 +308,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TOKEN_SERVICE_BASE_URL = "https://language-speaking-trainer.vercel.app";
+				TOKEN_SERVICE_SHARED_SECRET = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -342,6 +343,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TOKEN_SERVICE_BASE_URL = "https://language-speaking-trainer.vercel.app";
+				TOKEN_SERVICE_SHARED_SECRET = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
