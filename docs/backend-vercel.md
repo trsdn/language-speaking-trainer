@@ -12,12 +12,15 @@ This repo includes a minimal Vercel backend to mint **ephemeral Realtime client 
 
 - `GET /api/health` → `{ ok: true }`
 - `GET /api/realtime/token?topic=Space` → `{ value, expires_at, session }`
+  - **Authentication required**: Include `X-Token-Service-Secret` header or `Authorization: Bearer <secret>` header with the shared secret.
+  - Returns `401 Unauthorized` if secret is missing or invalid.
 
 ## Environment variables
 
 Create `.env` (or configure Vercel Project Env Vars):
 
 - `OPENAI_API_KEY` (required)
+- `TOKEN_SERVICE_SHARED_SECRET` (required) — shared secret for authentication between iOS app and backend. Generate a strong random secret using `openssl rand -base64 32`.
 - `REALTIME_EPHEMERAL_TTL_SECONDS` (optional, default 600)
 - `REALTIME_VOICE` (optional, default `alloy`)
 - `REALTIME_TOKEN_RPM` (optional, default 30) — best-effort per-instance rate limit
@@ -40,3 +43,4 @@ Typical local flow:
 In the iOS app `Info.plist`, set:
 
 - `TOKEN_SERVICE_BASE_URL` to your Vercel deployment URL (e.g. `https://your-vercel-app.vercel.app`).
+- `TOKEN_SERVICE_SHARED_SECRET` to the same shared secret configured in the backend's `TOKEN_SERVICE_SHARED_SECRET` env var.

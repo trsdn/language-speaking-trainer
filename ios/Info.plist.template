@@ -4,5 +4,14 @@
 <dict>
   <key>NSMicrophoneUsageDescription</key>
   <string>We use the microphone so you can practice speaking English with your virtual teacher.</string>
+  
+  <!-- Optional: Token service configuration (required for realtime sessions) -->
+  <!--
+  <key>TOKEN_SERVICE_BASE_URL</key>
+  <string>https://your-vercel-app.vercel.app</string>
+  
+  <key>TOKEN_SERVICE_SHARED_SECRET</key>
+  <string>your-shared-secret-here</string>
+  -->
 </dict>
 </plist>

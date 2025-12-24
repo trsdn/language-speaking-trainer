@@ -27,9 +27,10 @@ Template value suggestion:
 
 - `NSMicrophoneUsageDescription`: "We use the microphone so you can practice speaking English with your virtual teacher."
 
-Optional (for later Realtime token minting):
+Optional (for realtime token minting):
 
 - `TOKEN_SERVICE_BASE_URL`: `https://your-vercel-app.vercel.app`
+- `TOKEN_SERVICE_SHARED_SECRET`: The same shared secret configured in your backend's `TOKEN_SERVICE_SHARED_SECRET` environment variable. Generate using `openssl rand -base64 32`.
 
 Note: there is an older scaffold folder at `ios/LanguageSpeakingTrainer/` from before the `.xcodeproj` existed. The canonical sources going forward are the ones inside the Xcode project folder under `ios/App/...`.
 

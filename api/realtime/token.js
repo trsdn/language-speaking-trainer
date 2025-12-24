@@ -81,6 +81,19 @@ module.exports = async function handler(req, res) {
     return;
   }
 
+  // Authentication: require shared secret
+  const sharedSecret = process.env.TOKEN_SERVICE_SHARED_SECRET;
+  if (!sharedSecret) {
+    res.status(500).json({ error: "Server misconfigured (missing TOKEN_SERVICE_SHARED_SECRET)" });
+    return;
+  }
+
+  const clientSecret = req.headers["x-token-service-secret"] || req.headers["authorization"]?.replace(/^Bearer\s+/i, "");
+  if (!clientSecret || clientSecret !== sharedSecret) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
   const rl = rateLimitOk(req);
   if (!rl.ok) {
     res.setHeader("Retry-After", String(rl.retryAfterSeconds ?? 60));

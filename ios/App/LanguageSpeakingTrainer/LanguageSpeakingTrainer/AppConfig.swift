@@ -11,4 +11,15 @@ enum AppConfig {
         }
         return URL(string: raw)
     }
+    
+    /// Shared secret for token service authentication
+    static var tokenServiceSharedSecret: String? {
+        guard
+            let raw = Bundle.main.object(forInfoDictionaryKey: "TOKEN_SERVICE_SHARED_SECRET") as? String,
+            !raw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else {
+            return nil
+        }
+        return raw
+    }
 }

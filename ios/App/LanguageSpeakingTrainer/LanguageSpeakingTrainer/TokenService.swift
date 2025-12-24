@@ -7,6 +7,7 @@ struct EphemeralTokenResponse: Decodable {
 
 enum TokenServiceError: Error {
     case missingBaseURL
+    case missingSharedSecret
     case invalidResponse
     case httpError(status: Int, body: String)
 }
@@ -16,6 +17,8 @@ extension TokenServiceError: LocalizedError {
         switch self {
         case .missingBaseURL:
             return "Missing TOKEN_SERVICE_BASE_URL"
+        case .missingSharedSecret:
+            return "Missing TOKEN_SERVICE_SHARED_SECRET"
         case .invalidResponse:
             return "Invalid response from token service"
         case .httpError(let status, let body):
@@ -34,6 +37,10 @@ enum TokenService {
     ) async throws -> EphemeralTokenResponse {
         guard let base = AppConfig.tokenServiceBaseURL else {
             throw TokenServiceError.missingBaseURL
+        }
+        
+        guard let sharedSecret = AppConfig.tokenServiceSharedSecret else {
+            throw TokenServiceError.missingSharedSecret
         }
 
         // NOTE: Do not include a leading "/" in `appendingPathComponent`.
@@ -57,6 +64,7 @@ enum TokenService {
         var req = URLRequest(url: url)
         req.httpMethod = "GET"
         req.cachePolicy = .reloadIgnoringLocalCacheData
+        req.setValue(sharedSecret, forHTTPHeaderField: "X-Token-Service-Secret")
 
         let (data, resp) = try await URLSession.shared.data(for: req)
         guard let http = resp as? HTTPURLResponse else {
