@@ -15,7 +15,7 @@ It is intentionally lightweight: update it whenever you ship meaningful progress
 
 | Area | BDD spec | Implementation entry points | Status | Notes |
 | --- | --- | --- | --- | --- |
-| Home & topic selection | `features/home/home.feature` | `ios/App/LanguageSpeakingTrainer/LanguageSpeakingTrainer/HomeView.swift`, `Models.swift` | Implemented | Includes preset topics, surprise topic, custom topic + empty validation. |
+| Home & topic selection | `features/home/home.feature` | `ios/App/LanguageSpeakingTrainer/LanguageSpeakingTrainer/HomeView.swift`, `Models.swift` | Implemented | Includes preset topics (no horizontal scrolling), surprise topic, custom topic + empty validation. |
 | First-run onboarding | `features/onboarding/onboarding.feature` | `ios/App/LanguageSpeakingTrainer/LanguageSpeakingTrainer/OnboardingView.swift`, `AppModel.swift` | Implemented | Persists onboarding completion + selected values in `UserDefaults`. |
 | Settings (Realtime model) | `features/settings/settings.feature` | `ios/App/LanguageSpeakingTrainer/LanguageSpeakingTrainer/SettingsView.swift`, `AppModel.swift`, `TokenService.swift`, `api/realtime/token.js` | Implemented (UI only) | UI + persistence are implemented; verify that sessions use the selected model end-to-end. |
 | Settings (Learner context) | `features/settings/settings.feature` | `ios/App/LanguageSpeakingTrainer/LanguageSpeakingTrainer/SettingsView.swift`, `AppModel.swift`, `LearnerContext.swift`, `OpenAIWebRTCSession.swift` | Implemented (UI only) | UI + persistence are implemented; session instructions include learner context via `session.update`; verify end-to-end behavior. |
