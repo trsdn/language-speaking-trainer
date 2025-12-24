@@ -27,6 +27,14 @@ Feature: Realtime speaking session
     Then the app should resume capturing microphone audio
     And the app should indicate that my microphone is unmuted
 
+  @SE-006 @mvp
+  Scenario: Use loudspeaker when no headphones are connected
+    Given I am in an active speaking session
+    And I do not have headphones connected
+    Then the session audio output should use the device loudspeaker
+    When I connect headphones
+    Then the session audio output should route to the headphones
+
   @SE-002 @mvp
   Scenario: Child speaks and teacher responds
     Given I am in an active speaking session
