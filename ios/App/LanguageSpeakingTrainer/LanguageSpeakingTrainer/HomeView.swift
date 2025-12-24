@@ -32,7 +32,8 @@ struct HomeView: View {
             NavigationLink {
                 SessionView(
                     topic: appModel.selectedTopic ?? Topic.presets[0],
-                    modelPreference: appModel.realtimeModelPreference
+                    modelPreference: appModel.realtimeModelPreference,
+                    learnerContext: appModel.learnerContext
                 )
             } label: {
                 Text("Start")
