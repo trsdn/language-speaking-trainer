@@ -11,6 +11,9 @@ __pycache__/
 
 # Env
 .env
-
 # IDE
 .vscode/
+.vercel
+
+# Local scratch
+tmp/
