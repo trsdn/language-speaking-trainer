@@ -31,6 +31,20 @@ jobs:
     
     - name: Show Xcode version
       run: xcodebuild -version
+
+    - name: Select iOS Simulator destination
+      run: |
+        echo "Available simulators:"
+        xcrun simctl list devices available | sed -n '1,120p'
+
+        UDID=$(xcrun simctl list devices available | grep -m1 -E 'iPhone.*\([0-9A-F-]{36}\)' | sed -E 's/.*\(([0-9A-F-]{36})\).*/\1/')
+        if [ -z "$UDID" ]; then
+          echo "Failed to find an available iPhone simulator UDID" >&2
+          exit 1
+        fi
+
+        echo "Using iOS Simulator UDID: $UDID"
+        echo "DESTINATION=platform=iOS Simulator,id=$UDID" >> "$GITHUB_ENV"
     
     - name: Build for testing
       working-directory: ios/App/LanguageSpeakingTrainer
@@ -38,7 +52,7 @@ jobs:
         xcodebuild build-for-testing \
           -project LanguageSpeakingTrainer.xcodeproj \
           -scheme LanguageSpeakingTrainer \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+          -destination "$DESTINATION" \
           -derivedDataPath DerivedData
     
     - name: Run unit tests
@@ -47,7 +61,7 @@ jobs:
         xcodebuild test-without-building \
           -project LanguageSpeakingTrainer.xcodeproj \
           -scheme LanguageSpeakingTrainer \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+          -destination "$DESTINATION" \
           -derivedDataPath DerivedData \
           -resultBundlePath TestResults.xcresult || true
     
@@ -57,7 +71,7 @@ jobs:
         xcodebuild test-without-building \
           -project LanguageSpeakingTrainer.xcodeproj \
           -scheme LanguageSpeakingTrainer \
-          -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+          -destination "$DESTINATION" \
           -derivedDataPath DerivedData \
           -only-testing:LanguageSpeakingTrainerUITests \
           -resultBundlePath UITestResults.xcresult || true
