@@ -13,11 +13,23 @@ This repo includes a minimal Vercel backend to mint **ephemeral Realtime client 
 - `GET /api/health` → `{ ok: true }`
 - `GET /api/realtime/token?topic=Space` → `{ value, expires_at, session }`
 
+### Authentication (MVP shared secret)
+
+`/api/realtime/token` is protected by a shared secret to prevent unauthenticated token minting.
+
+Clients must send **either**:
+
+- `X-Token-Service-Secret: <secret>`
+- `Authorization: Bearer <secret>`
+
+Requests with a missing/invalid secret return **401**.
+
 ## Environment variables
 
 Create `.env` (or configure Vercel Project Env Vars):
 
 - `OPENAI_API_KEY` (required)
+- `TOKEN_SERVICE_SHARED_SECRET` (required) — shared secret to protect `/api/realtime/token`
 - `REALTIME_EPHEMERAL_TTL_SECONDS` (optional, default 600)
 - `REALTIME_VOICE` (optional, default `alloy`)
 - `REALTIME_TOKEN_RPM` (optional, default 30) — best-effort per-instance rate limit
@@ -33,10 +45,11 @@ Typical local flow:
   Link to an existing project name like `language-speaking-trainer`.
 3. Start local dev with `vercel dev` and test:
   `GET http://127.0.0.1:3000/api/health`
-  `GET http://127.0.0.1:3000/api/realtime/token?topic=Space`
+  `GET http://127.0.0.1:3000/api/realtime/token?topic=Space` (requires secret header)
 
 ## iOS configuration
 
 In the iOS app `Info.plist`, set:
 
 - `TOKEN_SERVICE_BASE_URL` to your Vercel deployment URL (e.g. `https://your-vercel-app.vercel.app`).
+- `TOKEN_SERVICE_SHARED_SECRET` to the same value as `TOKEN_SERVICE_SHARED_SECRET` on the backend.
