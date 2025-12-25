@@ -59,7 +59,7 @@ final class MicrophoneMonitor: ObservableObject {
     private func startEngineIfNeeded() {
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothHFP])
+            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetooth])
             try session.setActive(true)
 
             let input = engine.inputNode

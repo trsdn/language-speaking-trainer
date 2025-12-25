@@ -39,3 +39,17 @@ Each scenario has an ID tag to make test reporting stable.
 - Single user only (one child profile on device)
 - No parent area/dashboard in MVP
 - Rewards are optional (nice-to-have)
+
+## Running Spec Coverage Report
+
+Check which features are implemented vs. specified:
+
+```bash
+python3 scripts/spec-coverage.py
+```
+
+This script parses all `.feature` files, compares them with the implementation status in `FEATURE_REGISTRY.md`, and produces a coverage report showing:
+- Total scenarios by area
+- Implementation status (Implemented, In Progress, Planned)
+- Coverage percentage
+- Recommendations for next steps
