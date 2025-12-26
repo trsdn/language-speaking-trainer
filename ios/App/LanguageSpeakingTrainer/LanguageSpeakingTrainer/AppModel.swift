@@ -257,7 +257,11 @@ final class AppModel: ObservableObject {
     @Published var selectedTopic: Topic? = nil
 
     // First-run onboarding state
-    @Published var onboarding: OnboardingSettings
+    @Published var onboarding: OnboardingSettings {
+        didSet {
+            onboarding.save()
+        }
+    }
 
     // Settings
     @Published var realtimeModelPreference: RealtimeModelPreference {
@@ -281,9 +285,21 @@ final class AppModel: ObservableObject {
         if AppConfig.isUITesting, AppConfig.shouldResetStateOnLaunch {
             Self.resetPersistentStateForUITests()
         }
-        onboarding = OnboardingSettings.load()
-        realtimeModelPreference = Self.loadRealtimeModelPreference()
-        learnerProfile = LearnerProfile.load()
+
+        // Initialize stored properties using locals first (Swift forbids accessing `self`
+        // before all stored properties are initialized).
+        var initialOnboarding = OnboardingSettings.load()
+        // Provide sensible defaults so the app can work without a dedicated onboarding screen.
+        if initialOnboarding.ageBand == nil { initialOnboarding.ageBand = .earlyElementary }
+        if initialOnboarding.englishLevel == nil { initialOnboarding.englishLevel = .beginner }
+        initialOnboarding.save()
+
+        let initialRealtimePref = Self.loadRealtimeModelPreference()
+        let initialLearnerProfile = LearnerProfile.load()
+
+        onboarding = initialOnboarding
+        realtimeModelPreference = initialRealtimePref
+        learnerProfile = initialLearnerProfile
     }
 
     private static func resetPersistentStateForUITests() {
@@ -304,7 +320,19 @@ final class AppModel: ObservableObject {
 
     func completeOnboarding(ageBand: AgeBand, level: EnglishLevel) {
         onboarding = OnboardingSettings(isCompleted: true, ageBand: ageBand, englishLevel: level)
-        onboarding.save()
+    }
+
+    /// Marks the first-run setup as complete.
+    ///
+    /// We keep `OnboardingSettings` as the persistence mechanism for learner basics
+    /// (age band + English level) even though the dedicated onboarding screen is no longer used.
+    func markInitialSetupCompleteIfNeeded() {
+        guard onboarding.isCompleted == false else { return }
+        var updated = onboarding
+        updated.isCompleted = true
+        if updated.ageBand == nil { updated.ageBand = .earlyElementary }
+        if updated.englishLevel == nil { updated.englishLevel = .beginner }
+        onboarding = updated
     }
 
     func resetTopic() {

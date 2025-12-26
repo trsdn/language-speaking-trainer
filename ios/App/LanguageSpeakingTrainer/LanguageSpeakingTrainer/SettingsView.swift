@@ -26,6 +26,22 @@ struct SettingsView: View {
             }
 
             Section {
+                Picker("Age band", selection: ageBandBinding) {
+                    ForEach(AgeBand.allCases) { band in
+                        Text(band.displayName).tag(band)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("settings.ageBand")
+
+                Picker("English level", selection: englishLevelBinding) {
+                    ForEach(EnglishLevel.allCases) { level in
+                        Text(level.displayName).tag(level)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("settings.englishLevel")
+
                 TextField("Age (4–16)", text: $ageText)
                     .keyboardType(.numberPad)
                     .focused($isAgeFieldFocused)
@@ -93,6 +109,28 @@ struct SettingsView: View {
         .onAppear {
             ageText = appModel.learnerProfile.age.map(String.init) ?? ""
         }
+    }
+
+    private var ageBandBinding: Binding<AgeBand> {
+        Binding(
+            get: { appModel.onboarding.ageBand ?? .earlyElementary },
+            set: { newValue in
+                var o = appModel.onboarding
+                o.ageBand = newValue
+                appModel.onboarding = o
+            }
+        )
+    }
+
+    private var englishLevelBinding: Binding<EnglishLevel> {
+        Binding(
+            get: { appModel.onboarding.englishLevel ?? .beginner },
+            set: { newValue in
+                var o = appModel.onboarding
+                o.englishLevel = newValue
+                appModel.onboarding = o
+            }
+        )
     }
 
     private var schoolTypeRawBinding: Binding<String> {
