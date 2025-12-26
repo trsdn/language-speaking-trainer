@@ -108,7 +108,8 @@ module.exports = async function handler(req, res) {
 
   const expectedSecret = (process.env.TOKEN_SERVICE_SHARED_SECRET || "").trim();
   if (!expectedSecret) {
-    res.status(500).json({ error: "Server misconfigured (missing TOKEN_SERVICE_SHARED_SECRET)" });
+    console.error("TOKEN_SERVICE_SHARED_SECRET is not configured; refusing to serve realtime token.");
+    res.status(503).json({ error: "Service unavailable" });
     return;
   }
 
