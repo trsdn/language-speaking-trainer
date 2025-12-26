@@ -41,9 +41,9 @@ struct SettingsView: View {
                         .foregroundStyle(.red)
                 }
 
-                Picker("School type", selection: schoolTypeRawBinding) {
+                Picker(appModel.learnerProfile.country == .germany ? "Schulform" : "School type", selection: schoolTypeRawBinding) {
                     Text("Not set").tag("none")
-                    ForEach(SchoolType.allCases) { t in
+                    ForEach(SchoolType.options(for: appModel.learnerProfile.country)) { t in
                         Text(t.displayName).tag(t.rawValue)
                     }
                 }

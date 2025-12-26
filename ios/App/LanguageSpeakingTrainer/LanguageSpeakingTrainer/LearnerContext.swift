@@ -10,23 +10,30 @@ struct LearnerContext: Equatable {
     func settingsSnippet() -> String {
         var lines: [String] = []
 
+        let isGermany = (profile.country == .germany)
+
         if let age = profile.age {
-            lines.append("- Age: \(age)")
+            lines.append(isGermany ? "- Alter: \(age)" : "- Age: \(age)")
         }
         if let schoolType = profile.schoolType {
-            lines.append("- School type: \(schoolType.displayName)")
+            if isGermany {
+                lines.append("- Schulform: \(schoolType.germanDisplayName)")
+            } else {
+                lines.append("- School type: \(schoolType.displayName)")
+            }
         }
         if let country = profile.country {
-            lines.append("- Country: \(country.displayName)")
+            lines.append(isGermany ? "- Land: \(country.displayName)" : "- Country: \(country.displayName)")
         }
         if let bundesland = profile.bundesland {
+            // 'Bundesland' is already German and widely understood.
             lines.append("- Bundesland: \(bundesland.displayName)")
         }
         if let customCountryName = profile.customCountryName {
-            lines.append("- Custom country name: \(customCountryName)")
+            lines.append(isGermany ? "- Benutzerdefiniertes Land: \(customCountryName)" : "- Custom country name: \(customCountryName)")
         }
         if let region = profile.region {
-            lines.append("- Region/State: \(region)")
+            lines.append(isGermany ? "- Region/Bundesland: \(region)" : "- Region/State: \(region)")
         }
 
         guard !lines.isEmpty else { return "" }
@@ -37,8 +44,10 @@ struct LearnerContext: Equatable {
     func promptSnippet() -> String {
         var lines: [String] = []
 
+        let isGermany = (profile.country == .germany)
+
         if let age = profile.age {
-            lines.append("- Age: \(age)")
+            lines.append(isGermany ? "- Alter: \(age)" : "- Age: \(age)")
         }
         if let ageBand {
             lines.append("- Age band: \(ageBand.displayName)")
@@ -47,39 +56,43 @@ struct LearnerContext: Equatable {
             lines.append("- English level: \(englishLevel.displayName)")
         }
         if let schoolType = profile.schoolType {
-            lines.append("- School type: \(schoolType.displayName)")
+            if isGermany {
+                lines.append("- Schulform: \(schoolType.germanDisplayName)")
+            } else {
+                lines.append("- School type: \(schoolType.displayName)")
+            }
         }
 
         if let country = profile.country {
             switch country {
             case .germany:
                 if let bundesland = profile.bundesland {
-                    lines.append("- Location: Germany (\(bundesland.displayName))")
+                    lines.append("- Ort: Deutschland (\(bundesland.displayName))")
                 } else {
-                    lines.append("- Location: Germany")
+                    lines.append("- Ort: Deutschland")
                 }
             case .other:
                 if let name = profile.customCountryName {
                     if let region = profile.region {
-                        lines.append("- Location: \(name) (\(region))")
+                        lines.append(isGermany ? "- Ort: \(name) (\(region))" : "- Location: \(name) (\(region))")
                     } else {
-                        lines.append("- Location: \(name)")
+                        lines.append(isGermany ? "- Ort: \(name)" : "- Location: \(name)")
                     }
                 } else if let region = profile.region {
-                    lines.append("- Location: Other (\(region))")
+                    lines.append(isGermany ? "- Ort: Andere (\(region))" : "- Location: Other (\(region))")
                 } else {
-                    lines.append("- Location: Other")
+                    lines.append(isGermany ? "- Ort: Andere" : "- Location: Other")
                 }
             default:
                 if let region = profile.region {
-                    lines.append("- Location: \(country.displayName) (\(region))")
+                    lines.append(isGermany ? "- Ort: \(country.displayName) (\(region))" : "- Location: \(country.displayName) (\(region))")
                 } else {
-                    lines.append("- Location: \(country.displayName)")
+                    lines.append(isGermany ? "- Ort: \(country.displayName)" : "- Location: \(country.displayName)")
                 }
             }
         }
 
         guard !lines.isEmpty else { return "" }
-        return "Learner context (non-identifying):\n" + lines.joined(separator: "\n")
+        return (isGermany ? "Lernkontext (nicht-identifizierend):\n" : "Learner context (non-identifying):\n") + lines.joined(separator: "\n")
     }
 }

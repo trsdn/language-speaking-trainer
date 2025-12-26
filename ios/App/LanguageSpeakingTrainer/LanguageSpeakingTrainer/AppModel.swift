@@ -22,6 +22,16 @@ enum SchoolType: String, CaseIterable, Codable, Identifiable {
     case primarySchool
     case middleSchool
     case highSchool
+    /// Germany-specific school forms.
+    case grundschule
+    case gymnasium
+    case realschule
+    case hauptschule
+    /// Common term in some German states (e.g., Bavaria) roughly corresponding to lower secondary.
+    case mittelschule
+    case gesamtschule
+    case foerderschule
+    case berufsschule
     case other
 
     var id: String { rawValue }
@@ -32,7 +42,76 @@ enum SchoolType: String, CaseIterable, Codable, Identifiable {
         case .primarySchool: return "Primary school"
         case .middleSchool: return "Middle school"
         case .highSchool: return "High school"
+        case .grundschule: return "Grundschule"
+        case .gymnasium: return "Gymnasium"
+        case .realschule: return "Realschule"
+        case .hauptschule: return "Hauptschule"
+        case .mittelschule: return "Mittelschule"
+        case .gesamtschule: return "Gesamtschule"
+        case .foerderschule: return "Förderschule"
+        case .berufsschule: return "Berufsschule"
         case .other: return "Other"
+        }
+    }
+
+    /// A German label intended for prompts/context when the learner is in Germany.
+    /// (We keep it separate from `displayName` so non-Germany flows remain English.)
+    var germanDisplayName: String {
+        switch self {
+        case .kindergarten: return "Kindergarten"
+        case .grundschule: return "Grundschule"
+        case .gymnasium: return "Gymnasium"
+        case .realschule: return "Realschule"
+        case .hauptschule: return "Hauptschule"
+        case .mittelschule: return "Mittelschule"
+        case .gesamtschule: return "Gesamtschule"
+        case .foerderschule: return "Förderschule"
+        case .berufsschule: return "Berufsschule"
+        // Generic types don't map cleanly to the German system.
+        case .primarySchool: return "(nicht spezifiziert)"
+        case .middleSchool: return "(nicht spezifiziert)"
+        case .highSchool: return "(nicht spezifiziert)"
+        case .other: return "Andere"
+        }
+    }
+
+    static func options(for country: CountrySelection?) -> [SchoolType] {
+        switch country {
+        case .germany:
+            // Keep this short and age-appropriate; can be expanded later.
+            return [.kindergarten, .grundschule, .gymnasium, .realschule, .hauptschule, .mittelschule, .gesamtschule, .foerderschule, .berufsschule, .other]
+        default:
+            return [.kindergarten, .primarySchool, .middleSchool, .highSchool, .other]
+        }
+    }
+
+    /// Ensures the selected value makes sense for the currently selected country.
+    ///
+    /// This prevents the Settings picker from having a selection that isn't in its option list.
+    func normalized(for country: CountrySelection) -> SchoolType {
+        switch country {
+        case .germany:
+            switch self {
+            case .primarySchool: return .grundschule
+            // No reliable mapping from generic secondary school types to Germany.
+            // Return `.other` to avoid accidentally misclassifying.
+            case .middleSchool: return .other
+            case .highSchool: return .other
+            default: return self
+            }
+        default:
+            switch self {
+            case .grundschule: return .primarySchool
+            // German secondary school forms don't map 1:1; keep something roughly equivalent.
+            case .gymnasium: return .highSchool
+            case .realschule: return .middleSchool
+            case .hauptschule: return .middleSchool
+            case .mittelschule: return .middleSchool
+            case .gesamtschule: return .middleSchool
+            case .foerderschule: return .other
+            case .berufsschule: return .other
+            default: return self
+            }
         }
     }
 }
@@ -163,6 +242,10 @@ struct LearnerProfile: Codable, Equatable {
         default:
             copy.bundesland = nil
             copy.customCountryName = nil
+        }
+
+        if let country = copy.country, let schoolType = copy.schoolType {
+            copy.schoolType = schoolType.normalized(for: country)
         }
 
         return copy
