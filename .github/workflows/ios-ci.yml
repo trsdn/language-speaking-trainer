@@ -37,14 +37,55 @@ jobs:
         echo "Available simulators:"
         xcrun simctl list devices available | sed -n '1,120p'
 
-        UDID=$(xcrun simctl list devices available | grep -m1 -E 'iPhone.*\([0-9A-F-]{36}\)' | sed -E 's/.*\(([0-9A-F-]{36})\).*/\1/')
+        # Select a deterministic destination:
+        # - Prefer an iPhone device
+        # - From the newest available iOS runtime
+        UDID=$(python3 - <<'PY'
+        import json
+        import re
+        import subprocess
+
+        raw = subprocess.check_output(["xcrun", "simctl", "list", "-j", "devices", "available"], text=True)
+        data = json.loads(raw)
+
+        def ios_version(runtime_id: str):
+          # e.g. com.apple.CoreSimulator.SimRuntime.iOS-18-2
+          m = re.search(r"iOS-(\d+)-(\d+)", runtime_id)
+          if not m:
+            return None
+          return (int(m.group(1)), int(m.group(2)))
+
+        devices_by_runtime = data.get("devices", {})
+        ios_runtimes = [rt for rt in devices_by_runtime.keys() if ios_version(rt) is not None]
+        ios_runtimes.sort(key=lambda rt: ios_version(rt), reverse=True)
+
+        for rt in ios_runtimes:
+          for dev in devices_by_runtime.get(rt, []):
+            if not dev.get("isAvailable"):
+              continue
+            name = dev.get("name", "")
+            if name.startswith("iPhone") and dev.get("udid"):
+              print(dev["udid"])
+              raise SystemExit(0)
+
+        raise SystemExit(1)
+        PY
+        )
         if [ -z "$UDID" ]; then
-          echo "Failed to find an available iPhone simulator UDID" >&2
+          echo "Failed to select an available iPhone simulator UDID" >&2
           exit 1
         fi
 
         echo "Using iOS Simulator UDID: $UDID"
+        echo "UDID=$UDID" >> "$GITHUB_ENV"
         echo "DESTINATION=platform=iOS Simulator,id=$UDID" >> "$GITHUB_ENV"
+
+    - name: Boot simulator
+      run: |
+        # Ensure a clean, ready simulator to reduce flaky test failures.
+        xcrun simctl shutdown all || true
+        xcrun simctl boot "$UDID" || true
+        xcrun simctl bootstatus "$UDID" -b
     
     - name: Build for testing
       working-directory: ios/App/LanguageSpeakingTrainer
