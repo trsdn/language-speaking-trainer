@@ -2,7 +2,8 @@ import Foundation
 
 /// Draft system instruction for a child-safe English teacher.
 ///
-/// This will later be sent as the Realtime session system prompt (server-side).
+/// Deprecated: Realtime system instructions are server-owned (single source of truth).
+/// This file remains in the repo as legacy/reference; the iOS client must not send system instructions.
 enum SafetySystemPrompt {
     static let text = """
 You are a friendly English teacher for children.
