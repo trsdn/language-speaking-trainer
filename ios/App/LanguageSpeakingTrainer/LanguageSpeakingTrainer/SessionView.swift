@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct SessionView: View {
     let topic: Topic
@@ -121,6 +122,7 @@ struct SessionView: View {
     private func endSession() {
         mic.stop()
         sessionModel.stop()
+        UIApplication.shared.isIdleTimerDisabled = false
         dismiss()
     }
 }

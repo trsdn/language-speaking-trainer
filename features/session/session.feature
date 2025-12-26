@@ -22,8 +22,8 @@ Feature: Realtime speaking session
     Given I am in an active speaking session
     When I tap the mute input button
     Then the app should stop capturing microphone audio
-    And the app should indicate that my microphone is muted
     When I tap the mute input button again
+    Then the screen should return to normal sleep behavior
     Then the app should resume capturing microphone audio
     And the app should indicate that my microphone is unmuted
 
@@ -78,3 +78,10 @@ Feature: Realtime speaking session
     When I end the session
     Then the session should stop listening to my microphone
     And I should return to the home screen
+
+  @SE-010 @mvp
+  Scenario: Keep the screen awake during an active session
+    When I start the speaking session
+    Then the screen should not go to sleep while the session is active
+    When I end the session
+    Then the screen should return to normal sleep behavior

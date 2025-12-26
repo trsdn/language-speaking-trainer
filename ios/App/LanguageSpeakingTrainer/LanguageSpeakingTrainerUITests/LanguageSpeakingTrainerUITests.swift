@@ -10,8 +10,29 @@ final class LanguageSpeakingTrainerUITests: XCTestCase {
         app.launchEnvironment["RESET_STATE"] = "1"
         app.launch()
 
-        XCTAssertTrue(app.buttons["onboarding.continue"].waitForExistence(timeout: 5))
-        app.buttons["onboarding.continue"].tap()
+        // Onboarding: select required values (age band + English level) and wait for Continue
+        // to become enabled before tapping.
+        let ageBand = app.segmentedControls["onboarding.ageBand"]
+        let englishLevel = app.segmentedControls["onboarding.englishLevel"]
+        XCTAssertTrue(ageBand.waitForExistence(timeout: 5))
+        XCTAssertTrue(englishLevel.waitForExistence(timeout: 5))
+
+        // Even though the UI preselects defaults onAppear, CI can be fast enough that
+        // we tap Continue before state is set. Explicitly tapping an option makes the
+        // flow deterministic.
+        if ageBand.buttons.count > 0 {
+            ageBand.buttons.element(boundBy: 0).tap()
+        }
+        if englishLevel.buttons.count > 0 {
+            englishLevel.buttons.element(boundBy: 0).tap()
+        }
+
+        let continueButton = app.buttons["onboarding.continue"]
+        XCTAssertTrue(continueButton.waitForExistence(timeout: 5))
+        let continueReady = NSPredicate(format: "exists == true && enabled == true && hittable == true")
+        expectation(for: continueReady, evaluatedWith: continueButton)
+        waitForExpectations(timeout: 5)
+        continueButton.tap()
 
         XCTAssertTrue(app.buttons["home.topic.animals"].waitForExistence(timeout: 5))
         app.buttons["home.topic.animals"].tap()
