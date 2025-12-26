@@ -3,6 +3,7 @@ import SwiftUI
 struct SessionView: View {
     let topic: Topic
     let modelPreference: RealtimeModelPreference
+    let learnerContext: LearnerContext
 
     @Environment(\.dismiss) private var dismiss
 
@@ -11,11 +12,12 @@ struct SessionView: View {
 
     @State private var isMuted: Bool = false
 
-    init(topic: Topic, modelPreference: RealtimeModelPreference) {
+    init(topic: Topic, modelPreference: RealtimeModelPreference, learnerContext: LearnerContext) {
         self.topic = topic
         self.modelPreference = modelPreference
+        self.learnerContext = learnerContext
         _sessionModel = StateObject(wrappedValue: SessionModel(
-            client: RealtimeClientFactory.makeClient(modelPreference: modelPreference)
+            client: RealtimeClientFactory.makeClient(modelPreference: modelPreference, learnerContext: learnerContext)
         ))
     }
 

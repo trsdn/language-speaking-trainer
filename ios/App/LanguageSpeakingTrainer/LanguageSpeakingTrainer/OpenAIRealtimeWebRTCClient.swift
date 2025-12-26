@@ -1,5 +1,11 @@
 import Foundation
 
+#if canImport(WebRTC)
+import os.log
+
+private let logger = Logger(subsystem: "com.languagespeakingtrainer", category: "realtime")
+#endif
+
 final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
     var capturesMicrophone: Bool {
         #if canImport(WebRTC)
@@ -12,13 +18,15 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
     private var stopped = false
     private var isMuted = false
     private let modelPreference: RealtimeModelPreference
+    private let learnerContext: LearnerContext
 
     #if canImport(WebRTC)
     private var session: OpenAIWebRTCSession?
     #endif
 
-    init(modelPreference: RealtimeModelPreference = .realtimeMini) {
+    init(modelPreference: RealtimeModelPreference = .realtimeMini, learnerContext: LearnerContext) {
         self.modelPreference = modelPreference
+        self.learnerContext = learnerContext
     }
 
     func start(topic: Topic, onEvent: @escaping (RealtimeEvent) -> Void) {
@@ -26,11 +34,12 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
 
         Task {
             do {
-                #if DEBUG
+                #if DEBUG && canImport(WebRTC)
+                // Log configuration info to OSLog for debugging (not visible in UI)
                 if let base = AppConfig.tokenServiceBaseURL {
-                    onEvent(.systemNote("Token service: \(base.absoluteString)"))
+                    logger.debug("Token service configured: \(base.absoluteString, privacy: .public)")
                 } else {
-                    onEvent(.systemNote("Token service not configured (missing TOKEN_SERVICE_BASE_URL in Info.plist)."))
+                    logger.warning("Token service not configured (missing TOKEN_SERVICE_BASE_URL in Info.plist)")
                 }
                 #endif
 
@@ -41,6 +50,7 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
                 let s = OpenAIWebRTCSession(
                     ephemeralKey: token.value,
                     topic: topic,
+                    learnerContext: learnerContext,
                     isMuted: isMuted,
                     onEvent: onEvent
                 )

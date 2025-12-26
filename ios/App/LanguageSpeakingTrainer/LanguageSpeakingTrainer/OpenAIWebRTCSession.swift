@@ -17,6 +17,7 @@ import AVFoundation
 final class OpenAIWebRTCSession: NSObject {
     private let ephemeralKey: String
     private let topic: Topic
+    private let learnerContext: LearnerContext
     private let onEvent: (RealtimeEvent) -> Void
 
     private let factory: RTCPeerConnectionFactory
@@ -34,9 +35,16 @@ final class OpenAIWebRTCSession: NSObject {
     // Accumulate text deltas into a single message (best-effort).
     private var pendingText: String = ""
 
-    init(ephemeralKey: String, topic: Topic, isMuted: Bool, onEvent: @escaping (RealtimeEvent) -> Void) {
+    init(
+        ephemeralKey: String,
+        topic: Topic,
+        learnerContext: LearnerContext,
+        isMuted: Bool,
+        onEvent: @escaping (RealtimeEvent) -> Void
+    ) {
         self.ephemeralKey = ephemeralKey
         self.topic = topic
+        self.learnerContext = learnerContext
         self.isMuted = isMuted
         self.onEvent = onEvent
 
@@ -155,7 +163,7 @@ final class OpenAIWebRTCSession: NSObject {
 
             // Speaker-first unless a headset/external output is connected.
             // `.defaultToSpeaker` prevents the “earpiece” (receiver) default.
-            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothHFP])
+            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetooth])
             try session.setMode(.voiceChat)
             try session.setActive(true)
 
@@ -366,11 +374,18 @@ extension OpenAIWebRTCSession: RTCDataChannelDelegate {
             onEvent(.systemNote("Events channel ready."))
 
             // Keep us on-topic (in case server-side instructions were minimal):
+            let learnerSnippet = learnerContext.promptSnippet()
+            var instructions = SafetySystemPrompt.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !learnerSnippet.isEmpty {
+                instructions += "\n\n" + learnerSnippet
+            }
+            instructions += "\n\nTopic: \(topic.title). Greet first and ask one simple question."
+
             sendClientEvent([
                 "type": "session.update",
                 "session": [
                     "type": "realtime",
-                    "instructions": "You are a friendly English teacher for children. Stay on the topic: \(topic.title). Greet first and ask one simple question.",
+                    "instructions": instructions,
                 ]
             ])
         }

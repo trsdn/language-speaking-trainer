@@ -50,6 +50,28 @@ Feature: Realtime speaking session
     And the teacher should provide at most one simple correction at a time
     And the teacher should prompt me to try again with an example
 
+  @SE-007 @mvp
+  Scenario: Encourage speaking with easy choice questions
+    Given I am in an active speaking session
+    When I seem unsure or answer with only one word
+    Then the teacher should respond supportively
+    And the teacher should offer an easy A/B choice question to help me speak more
+    And the teacher should ask at most one question at a time
+
+  @SE-008 @mvp
+  Scenario: Use sentence starters to scaffold longer answers
+    Given I am in an active speaking session
+    When the teacher asks me to talk about the topic
+    Then the teacher should provide a simple sentence starter I can complete
+    And the teacher should keep their turns short
+    And the teacher should ask at most one question at a time
+
+  @SE-009
+  Scenario: Use light retrieval practice to build memory
+    Given I am in an active speaking session
+    When I successfully use a useful phrase
+    Then later in the conversation the teacher should ask me to say the phrase again
+
   @SE-004 @mvp
   Scenario: End a session
     Given I am in an active speaking session

@@ -39,3 +39,11 @@ Feature: Home and topic selection
     When I specify a topic as ""
     Then I should see a validation message
     And I should remain on the home screen
+
+  @HO-006 @mvp
+  Scenario: Topics are visible without horizontal scrolling
+    Given I am on the home screen
+    Then I should be able to see all preset topics at a glance without horizontal scrolling
+    And the selected topic state should be clear and consistent
+    And Surprise and Custom topic should still be available
+    And the layout should work with larger text sizes without clipping
