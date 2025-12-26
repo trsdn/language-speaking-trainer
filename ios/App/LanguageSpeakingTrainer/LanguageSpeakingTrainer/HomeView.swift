@@ -8,6 +8,10 @@ struct HomeView: View {
 
     private let surpriseTopics: [Topic] = Topic.presets
 
+    private static let topicGridColumns: [GridItem] = [
+        GridItem(.adaptive(minimum: 120), spacing: 10, alignment: .leading)
+    ]
+
     var body: some View {
         VStack(spacing: 16) {
             VStack(spacing: 8) {
@@ -71,9 +75,7 @@ struct HomeView: View {
             Text("Topic")
                 .font(.headline)
 
-            let columns: [GridItem] = [GridItem(.adaptive(minimum: 120), spacing: 10, alignment: .leading)]
-
-            LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
+            LazyVGrid(columns: Self.topicGridColumns, alignment: .leading, spacing: 10) {
                 ForEach(Topic.presets) { topic in
                     TopicChip(title: topic.title, isSelected: appModel.selectedTopic == topic) {
                         appModel.selectedTopic = topic
