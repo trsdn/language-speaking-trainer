@@ -70,20 +70,20 @@ struct HomeView: View {
             Text("Topic")
                 .font(.headline)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(Topic.presets) { topic in
-                        TopicChip(title: topic.title, isSelected: appModel.selectedTopic == topic) {
-                            appModel.selectedTopic = topic
-                        }
-                    }
+            let columns: [GridItem] = [GridItem(.adaptive(minimum: 120), spacing: 10, alignment: .leading)]
 
-                    TopicChip(title: "Surprise", isSelected: false) {
-                        appModel.selectedTopic = surpriseTopics.randomElement()
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 10) {
+                ForEach(Topic.presets) { topic in
+                    TopicChip(title: topic.title, isSelected: appModel.selectedTopic == topic) {
+                        appModel.selectedTopic = topic
                     }
                 }
-                .padding(.vertical, 4)
+
+                TopicChip(title: "Surprise", isSelected: false) {
+                    appModel.selectedTopic = surpriseTopics.randomElement()
+                }
             }
+            .padding(.vertical, 4)
 
             HStack(spacing: 8) {
                 TextField("Custom topic (e.g. Space)", text: $customTopicText)
@@ -117,10 +117,14 @@ private struct TopicChip: View {
         Button(action: onTap) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, minHeight: 36)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
         }
         .buttonStyle(.bordered)
         .tint(isSelected ? .blue : .gray)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

@@ -1,0 +1,106 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run iOS Tests
+    runs-on: macos-latest
+    
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Select Xcode version
+      run: |
+        if [ -d "/Applications/Xcode.app/Contents/Developer" ]; then
+          sudo xcode-select -s "/Applications/Xcode.app/Contents/Developer"
+        else
+          echo "No /Applications/Xcode.app found; using current selection: $(xcode-select -p)"
+        fi
+    
+    - name: Show Xcode version
+      run: xcodebuild -version
+
+    - name: Select iOS Simulator destination
+      run: |
+        echo "Available simulators:"
+        xcrun simctl list devices available | sed -n '1,120p'
+
+        UDID=$(xcrun simctl list devices available | grep -m1 -E 'iPhone.*\([0-9A-F-]{36}\)' | sed -E 's/.*\(([0-9A-F-]{36})\).*/\1/')
+        if [ -z "$UDID" ]; then
+          echo "Failed to find an available iPhone simulator UDID" >&2
+          exit 1
+        fi
+
+        echo "Using iOS Simulator UDID: $UDID"
+        echo "DESTINATION=platform=iOS Simulator,id=$UDID" >> "$GITHUB_ENV"
+    
+    - name: Build for testing
+      working-directory: ios/App/LanguageSpeakingTrainer
+      run: |
+        xcodebuild build-for-testing \
+          -project LanguageSpeakingTrainer.xcodeproj \
+          -scheme LanguageSpeakingTrainer \
+          -destination "$DESTINATION" \
+          -derivedDataPath DerivedData
+    
+    - name: Run unit tests
+      working-directory: ios/App/LanguageSpeakingTrainer
+      run: |
+        xcodebuild test-without-building \
+          -project LanguageSpeakingTrainer.xcodeproj \
+          -scheme LanguageSpeakingTrainer \
+          -destination "$DESTINATION" \
+          -derivedDataPath DerivedData \
+          -resultBundlePath TestResults.xcresult || true
+    
+    - name: Run UI tests
+      working-directory: ios/App/LanguageSpeakingTrainer
+      run: |
+        xcodebuild test-without-building \
+          -project LanguageSpeakingTrainer.xcodeproj \
+          -scheme LanguageSpeakingTrainer \
+          -destination "$DESTINATION" \
+          -derivedDataPath DerivedData \
+          -only-testing:LanguageSpeakingTrainerUITests \
+          -resultBundlePath UITestResults.xcresult || true
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          ios/App/LanguageSpeakingTrainer/TestResults.xcresult
+          ios/App/LanguageSpeakingTrainer/UITestResults.xcresult
+        if-no-files-found: ignore
+  
+  spec-coverage:
+    name: Check Spec Coverage
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    
+    - name: Run spec coverage report
+      run: python3 scripts/spec-coverage.py
