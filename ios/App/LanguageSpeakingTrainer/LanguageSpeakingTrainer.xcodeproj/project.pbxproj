@@ -35,6 +35,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		1E317C2A47E90CFF54B47A4D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		210056412EFB1FFA005133E6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -50,13 +57,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		1E317C2A47E90CFF54B47A4D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -65,6 +65,7 @@
 			children = (
 				210056462EFB1FFA005133E6 /* LanguageSpeakingTrainer */,
 				210056452EFB1FFA005133E6 /* Products */,
+				21DB1B1A2EFF28F0007D4260 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -76,6 +77,15 @@
 				4EC68493B4CB9BDA1E5E926D /* LanguageSpeakingTrainerUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		21DB1B1A2EFF28F0007D4260 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				29072EA019036E55B5EB5C8F /* LanguageSpeakingTrainerTests */,
+				A1B6F2044CF131706B43253D /* LanguageSpeakingTrainerUITests */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -392,11 +402,11 @@
 				DEVELOPMENT_TEAM = G69Z5BNY97;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "LanguageSpeakingTrainer/LanguageSpeakingTrainer-Info.plist";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../WebRTCHeaderShim",
 				);
+				INFOPLIST_FILE = "LanguageSpeakingTrainer/LanguageSpeakingTrainer-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -411,9 +421,9 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TOKEN_SERVICE_BASE_URL = "https://language-speaking-trainer.vercel.app";
 				TOKEN_SERVICE_SHARED_SECRET = "";
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -427,11 +437,11 @@
 				DEVELOPMENT_TEAM = G69Z5BNY97;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "LanguageSpeakingTrainer/LanguageSpeakingTrainer-Info.plist";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../../WebRTCHeaderShim",
 				);
+				INFOPLIST_FILE = "LanguageSpeakingTrainer/LanguageSpeakingTrainer-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -446,11 +456,28 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TOKEN_SERVICE_BASE_URL = "https://language-speaking-trainer.vercel.app";
 				TOKEN_SERVICE_SHARED_SECRET = "";
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
+		};
+		2F1CDA574D6431C3BEFBA891 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G69Z5BNY97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = LanguageSpeakingTrainerUITests;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = trsdn.LanguageSpeakingTrainerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = LanguageSpeakingTrainer;
+			};
+			name = Debug;
 		};
 		41B99CE4EFBEE469FABE584F /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -460,7 +487,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G69Z5BNY97;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "LanguageSpeakingTrainerTests";
+				INFOPLIST_KEY_CFBundleDisplayName = LanguageSpeakingTrainerTests;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = trsdn.LanguageSpeakingTrainerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -478,7 +505,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G69Z5BNY97;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "LanguageSpeakingTrainerTests";
+				INFOPLIST_KEY_CFBundleDisplayName = LanguageSpeakingTrainerTests;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = trsdn.LanguageSpeakingTrainerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -488,23 +515,6 @@
 			};
 			name = Release;
 		};
-		2F1CDA574D6431C3BEFBA891 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = G69Z5BNY97;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "LanguageSpeakingTrainerUITests";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				PRODUCT_BUNDLE_IDENTIFIER = trsdn.LanguageSpeakingTrainerUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = LanguageSpeakingTrainer;
-			};
-			name = Debug;
-		};
 		A415101624EC096C33D95876 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -512,7 +522,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G69Z5BNY97;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "LanguageSpeakingTrainerUITests";
+				INFOPLIST_KEY_CFBundleDisplayName = LanguageSpeakingTrainerUITests;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				PRODUCT_BUNDLE_IDENTIFIER = trsdn.LanguageSpeakingTrainerUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -543,20 +553,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C4B1502D35336EFA705B36D9 /* Build configuration list for PBXNativeTarget "LanguageSpeakingTrainerTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				41B99CE4EFBEE469FABE584F /* Debug */,
-				A0823DCA606429C46CB13FB6 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		3A3EC50B0484DA71548F1321 /* Build configuration list for PBXNativeTarget "LanguageSpeakingTrainerUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2F1CDA574D6431C3BEFBA891 /* Debug */,
 				A415101624EC096C33D95876 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C4B1502D35336EFA705B36D9 /* Build configuration list for PBXNativeTarget "LanguageSpeakingTrainerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				41B99CE4EFBEE469FABE584F /* Debug */,
+				A0823DCA606429C46CB13FB6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
