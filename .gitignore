@@ -17,3 +17,6 @@ __pycache__/
 
 # Local scratch
 tmp/
+
+# Docs artifacts
+docs/*.pdf

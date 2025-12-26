@@ -26,10 +26,20 @@ struct Topic: Equatable, Hashable, Codable, Identifiable {
     }
 
     static let presets: [Topic] = [
-        Topic(id: "animals", title: "Animals"),
-        Topic(id: "school", title: "School"),
-        Topic(id: "sports", title: "Sports"),
-        Topic(id: "food", title: "Food"),
-        Topic(id: "space", title: "Space")
+        // Grade 6 (Lower Saxony, Gymnasium Sek I) speaking-first topics.
+        // Anchored in KC guidance for Jg. 5/6: prioritize listening + speaking and
+        // use contexts of immediate personal relevance.
+        Topic(id: "classroom-talk", title: "Classroom talk"),
+        Topic(id: "friends", title: "Friends"),
+        Topic(id: "making-plans", title: "Making plans"),
+        Topic(id: "sorry-and-solutions", title: "Sorry & solutions"),
+        Topic(id: "school-day", title: "My school day"),
+        Topic(id: "food-ordering", title: "Food & ordering"),
+        Topic(id: "shopping-clothes", title: "Shopping (clothes)"),
+        Topic(id: "my-town", title: "My town"),
+        Topic(id: "public-transport", title: "Getting around"),
+        Topic(id: "directions", title: "Directions"),
+        Topic(id: "animals-nature", title: "Animals & nature"),
+        Topic(id: "trips-holidays", title: "Trips & holidays")
     ]
 }

@@ -3,7 +3,23 @@ import XCTest
 
 final class LanguageSpeakingTrainerTests: XCTestCase {
     func testTopicPresetsAreStable() {
-        XCTAssertEqual(Topic.presets.map(\.id), ["animals", "school", "sports", "food", "space"])
+        XCTAssertEqual(
+            Topic.presets.map(\.id),
+            [
+                "classroom-talk",
+                "friends",
+                "making-plans",
+                "sorry-and-solutions",
+                "school-day",
+                "food-ordering",
+                "shopping-clothes",
+                "my-town",
+                "public-transport",
+                "directions",
+                "animals-nature",
+                "trips-holidays"
+            ]
+        )
     }
 
     func testSessionModelDisablesIdleTimerWhileSessionInProgress() async {
