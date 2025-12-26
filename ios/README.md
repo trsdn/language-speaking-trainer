@@ -30,6 +30,9 @@ Template value suggestion:
 Optional (for later Realtime token minting):
 
 - `TOKEN_SERVICE_BASE_URL`: `https://your-vercel-app.vercel.app`
+- `TOKEN_SERVICE_SHARED_SECRET`: a shared secret that the backend requires on `/api/realtime/token`
+
+Note: This is MVP protection suitable for a single-user/private deployment. For a public app, a shipped secret can be extracted.
 
 Note: there is an older scaffold folder at `ios/LanguageSpeakingTrainer/` from before the `.xcodeproj` existed. The canonical sources going forward are the ones inside the Xcode project folder under `ios/App/...`.
 

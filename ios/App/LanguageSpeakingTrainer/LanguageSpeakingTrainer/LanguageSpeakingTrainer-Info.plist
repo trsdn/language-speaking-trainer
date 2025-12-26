@@ -27,6 +27,9 @@
 	<key>TOKEN_SERVICE_BASE_URL</key>
 	<string>$(TOKEN_SERVICE_BASE_URL)</string>
 
+	<key>TOKEN_SERVICE_SHARED_SECRET</key>
+	<string>$(TOKEN_SERVICE_SHARED_SECRET)</string>
+
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

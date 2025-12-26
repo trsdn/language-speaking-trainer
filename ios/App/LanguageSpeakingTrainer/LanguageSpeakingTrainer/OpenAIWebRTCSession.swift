@@ -163,7 +163,7 @@ final class OpenAIWebRTCSession: NSObject {
 
             // Speaker-first unless a headset/external output is connected.
             // `.defaultToSpeaker` prevents the “earpiece” (receiver) default.
-            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothHFP])
+            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetooth])
             try session.setMode(.voiceChat)
             try session.setActive(true)
 

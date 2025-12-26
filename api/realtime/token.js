@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 const SYSTEM_INSTRUCTIONS = `You are a friendly English teacher for children.
 
 Rules:
@@ -44,6 +46,29 @@ const _rlState = {
   hitsByIp: new Map()
 };
 
+function timingSafeEqualStrings(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
+}
+
+function getPresentedSharedSecret(req) {
+  const headers = req.headers || {};
+
+  const direct = headers["x-token-service-secret"] ?? headers["X-Token-Service-Secret"];
+  if (typeof direct === "string" && direct.trim().length > 0) return direct.trim();
+
+  const auth = headers["authorization"] ?? headers["Authorization"];
+  if (typeof auth === "string") {
+    const m = auth.match(/^Bearer\s+(.+)$/i);
+    if (m && m[1] && m[1].trim().length > 0) return m[1].trim();
+  }
+
+  return null;
+}
+
 function getClientIp(req) {
   const xff = req.headers?.["x-forwarded-for"];
   if (typeof xff === "string" && xff.length > 0) {
@@ -78,6 +103,18 @@ module.exports = async function handler(req, res) {
 
   if (req.method !== "GET") {
     res.status(405).json({ error: "Method not allowed" });
+    return;
+  }
+
+  const expectedSecret = (process.env.TOKEN_SERVICE_SHARED_SECRET || "").trim();
+  if (!expectedSecret) {
+    res.status(500).json({ error: "Server misconfigured (missing TOKEN_SERVICE_SHARED_SECRET)" });
+    return;
+  }
+
+  const presentedSecret = getPresentedSharedSecret(req);
+  if (!presentedSecret || !timingSafeEqualStrings(presentedSecret, expectedSecret)) {
+    res.status(401).json({ error: "Unauthorized" });
     return;
   }
 

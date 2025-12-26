@@ -1,5 +1,11 @@
 import Foundation
 
+#if canImport(WebRTC)
+import os.log
+
+private let logger = Logger(subsystem: "com.languagespeakingtrainer", category: "realtime")
+#endif
+
 final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
     var capturesMicrophone: Bool {
         #if canImport(WebRTC)
@@ -28,11 +34,12 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
 
         Task {
             do {
-                #if DEBUG
+                #if DEBUG && canImport(WebRTC)
+                // Log configuration info to OSLog for debugging (not visible in UI)
                 if let base = AppConfig.tokenServiceBaseURL {
-                    onEvent(.systemNote("Token service: \(base.absoluteString)"))
+                    logger.debug("Token service configured: \(base.absoluteString, privacy: .public)")
                 } else {
-                    onEvent(.systemNote("Token service not configured (missing TOKEN_SERVICE_BASE_URL in Info.plist)."))
+                    logger.warning("Token service not configured (missing TOKEN_SERVICE_BASE_URL in Info.plist)")
                 }
                 #endif
 

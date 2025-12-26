@@ -4,5 +4,11 @@
 <dict>
   <key>NSMicrophoneUsageDescription</key>
   <string>We use the microphone so you can practice speaking English with your virtual teacher.</string>
+
+  <key>TOKEN_SERVICE_BASE_URL</key>
+  <string>$(TOKEN_SERVICE_BASE_URL)</string>
+
+  <key>TOKEN_SERVICE_SHARED_SECRET</key>
+  <string>$(TOKEN_SERVICE_SHARED_SECRET)</string>
 </dict>
 </plist>
