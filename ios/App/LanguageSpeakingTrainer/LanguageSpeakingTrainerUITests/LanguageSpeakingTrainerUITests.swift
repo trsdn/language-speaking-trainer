@@ -17,8 +17,8 @@ final class LanguageSpeakingTrainerUITests: XCTestCase {
             doneButton.tap()
         }
 
-        XCTAssertTrue(app.buttons["home.topic.animals"].waitForExistence(timeout: 5))
-        app.buttons["home.topic.animals"].tap()
+        XCTAssertTrue(app.buttons["home.topic.friends"].waitForExistence(timeout: 5))
+        app.buttons["home.topic.friends"].tap()
 
         XCTAssertTrue(app.buttons["home.start"].waitForExistence(timeout: 5))
         app.buttons["home.start"].tap()
