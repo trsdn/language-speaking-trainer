@@ -16,6 +16,12 @@ final class MicrophoneMonitor: ObservableObject {
     private var didInstallTap = false
 
     func startIfPossible() {
+        // UI tests must not trigger permission prompts or audio session work.
+        if AppConfig.isUITesting {
+            hasPermission = false
+            level = 0
+            return
+        }
         Task {
             let ok = await requestPermissionIfNeeded()
             hasPermission = ok

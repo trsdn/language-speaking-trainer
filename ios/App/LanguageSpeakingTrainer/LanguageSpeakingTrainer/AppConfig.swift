@@ -1,6 +1,17 @@
 import Foundation
 
 enum AppConfig {
+    static var isUITesting: Bool {
+        let raw = ProcessInfo.processInfo.environment["UITESTING"]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return raw == "1" || raw == "true" || raw == "yes"
+    }
+
+    /// When true, the app should reset persistent state on launch (used by XCUITest).
+    static var shouldResetStateOnLaunch: Bool {
+        let raw = ProcessInfo.processInfo.environment["RESET_STATE"]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return raw == "1" || raw == "true" || raw == "yes"
+    }
+
     /// Example: https://your-vercel-app.vercel.app
     static var tokenServiceBaseURL: URL? {
         guard

@@ -13,7 +13,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple, Optional
 
 # ANSI color codes
 GREEN = '\033[92m'
@@ -41,8 +41,11 @@ def parse_feature_files(features_dir: Path) -> Dict[str, List[str]]:
 
 
 def parse_feature_registry(registry_path: Path) -> Dict[str, Tuple[str, str]]:
-    """Parse FEATURE_REGISTRY.md and extract implementation status."""
-    registry = {}
+    """Parse FEATURE_REGISTRY.md and extract implementation status.
+
+    Returns a mapping keyed by the human-readable Area column.
+    """
+    registry: Dict[str, Tuple[str, str]] = {}
     
     if not registry_path.exists():
         print(f"{RED}Error: FEATURE_REGISTRY.md not found at {registry_path}{RESET}")
@@ -50,12 +53,15 @@ def parse_feature_registry(registry_path: Path) -> Dict[str, Tuple[str, str]]:
     
     content = registry_path.read_text()
     
-    # Parse the registry table
+    # Parse the first (main) registry table only.
     in_table = False
+    saw_data_row = False
     for line in content.split('\n'):
         if line.startswith('| Area |'):
             in_table = True
             continue
+        if in_table and line.strip() == '' and saw_data_row:
+            break
         if in_table and line.startswith('|'):
             parts = [p.strip() for p in line.split('|')[1:-1]]  # Remove empty first/last
             if len(parts) >= 4 and parts[0] and parts[0] != '---':
@@ -63,8 +69,60 @@ def parse_feature_registry(registry_path: Path) -> Dict[str, Tuple[str, str]]:
                 status = parts[3]
                 notes = parts[4] if len(parts) > 4 else ""
                 registry[area] = (status, notes)
+                saw_data_row = True
     
     return registry
+
+
+def parse_feature_registry_spec_paths(registry_path: Path) -> Dict[str, str]:
+    """Parse FEATURE_REGISTRY.md and extract mapping: spec path -> area label.
+
+    This is used to cross-check whether we have test coverage for the scenarios in a spec
+    that is tracked in the registry.
+    """
+    mapping: Dict[str, str] = {}
+
+    if not registry_path.exists():
+        return mapping
+
+    content = registry_path.read_text()
+    in_table = False
+    saw_data_row = False
+    for line in content.split('\n'):
+        if line.startswith('| Area |'):
+            in_table = True
+            continue
+        if in_table and line.strip() == '' and saw_data_row:
+            break
+        if in_table and line.startswith('|'):
+            parts = [p.strip() for p in line.split('|')[1:-1]]
+            if len(parts) >= 2 and parts[0] and parts[0] != '---':
+                area_label = parts[0]
+                bdd_spec_cell = parts[1]
+                m = re.search(r'`([^`]+\.feature)`', bdd_spec_cell)
+                if m:
+                    mapping[m.group(1)] = area_label
+                    saw_data_row = True
+
+    return mapping
+
+
+def parse_test_scenario_ids(ios_dir: Path) -> Set[str]:
+    """Scan iOS test sources for scenario IDs like @ON-001, @HO-005, etc."""
+    ids: Set[str] = set()
+
+    for swift_file in ios_dir.rglob('*.swift'):
+        p = str(swift_file)
+        if 'Tests' not in p and 'UITests' not in p:
+            continue
+        try:
+            content = swift_file.read_text()
+        except Exception:
+            continue
+        found = re.findall(r'@([A-Z]{2}-\d{3})', content)
+        ids.update(found)
+
+    return ids
 
 
 def find_swift_files_for_features(ios_dir: Path, features: List[str]) -> Set[str]:
@@ -77,7 +135,13 @@ def find_swift_files_for_features(ios_dir: Path, features: List[str]) -> Set[str
     return swift_files
 
 
-def print_report(scenarios: Dict[str, List[str]], registry: Dict[str, Tuple[str, str]], swift_files: Set[str]):
+def print_report(
+    scenarios: Dict[str, List[str]],
+    registry: Dict[str, Tuple[str, str]],
+    registry_spec_paths: Dict[str, str],
+    swift_files: Set[str],
+    test_scenario_ids: Set[str]
+):
     """Print the coverage report."""
     
     print(f"\n{BLUE}{'='*80}{RESET}")
@@ -86,6 +150,19 @@ def print_report(scenarios: Dict[str, List[str]], registry: Dict[str, Tuple[str,
     
     total_scenarios = sum(len(ids) for ids in scenarios.values())
     print(f"Total scenarios found in .feature files: {total_scenarios}\n")
+
+    all_feature_ids: Set[str] = set()
+    for ids in scenarios.values():
+        all_feature_ids.update(ids)
+
+    covered_ids = all_feature_ids.intersection(test_scenario_ids)
+    uncovered_ids = sorted(all_feature_ids.difference(test_scenario_ids))
+    unknown_test_ids = sorted(test_scenario_ids.difference(all_feature_ids))
+
+    print(f"Total scenario IDs referenced in iOS tests: {len(test_scenario_ids)}")
+    if all_feature_ids:
+        coverage_pct = (len(covered_ids) / len(all_feature_ids)) * 100
+        print(f"{BLUE}Scenario coverage (by ID): {coverage_pct:.1f}%{RESET} ({len(covered_ids)}/{len(all_feature_ids)})\n")
     
     # Group scenarios by area
     print(f"{BLUE}Scenarios by Area:{RESET}")
@@ -134,14 +211,53 @@ def print_report(scenarios: Dict[str, List[str]], registry: Dict[str, Tuple[str,
     
     total = len(implemented) + len(in_progress) + len(planned)
     if total > 0:
-        coverage_pct = (len(implemented) / total) * 100
-        print(f"\n{BLUE}Coverage: {coverage_pct:.1f}%{RESET}")
+        registry_pct = (len(implemented) / total) * 100
+        print(f"\n{BLUE}Registry completion (areas marked implemented): {registry_pct:.1f}%{RESET}")
     
     print(f"\n{BLUE}Swift Implementation Files:{RESET} {len(swift_files)}")
     
     # Recommendations
     print(f"\n{BLUE}{'='*80}{RESET}")
     print(f"{BLUE}Recommendations:{RESET}\n")
+
+    if uncovered_ids:
+        print(f"{RED}✗ Scenarios in specs without any test mapping:{RESET}")
+        for scenario_id in uncovered_ids:
+            print(f"  - {scenario_id}")
+
+    if unknown_test_ids:
+        print(f"\n{YELLOW}⚠ Scenario IDs referenced in tests but missing from specs:{RESET}")
+        for scenario_id in unknown_test_ids:
+            print(f"  - {scenario_id}")
+
+    # Registry ↔ tests cross-check, using the spec paths in the registry table.
+    registry_areas: Set[str] = set()
+    for spec_path in registry_spec_paths.keys():
+        area = Path(spec_path).parent.name
+        registry_areas.add(area)
+
+    areas_with_tests: Set[str] = set()
+    for area, ids in scenarios.items():
+        if set(ids).intersection(test_scenario_ids):
+            areas_with_tests.add(area)
+
+    registry_gaps: List[str] = []
+    for spec_path, area_label in registry_spec_paths.items():
+        area = Path(spec_path).parent.name
+        ids = set(scenarios.get(area, []))
+        if ids and not ids.intersection(test_scenario_ids):
+            registry_gaps.append(f"{area_label} ({spec_path})")
+
+    if registry_gaps:
+        print(f"\n{YELLOW}⚠ Registry entries with no test coverage yet:{RESET}")
+        for item in registry_gaps:
+            print(f"  - {item}")
+
+    missing_registry_areas = sorted(areas_with_tests.difference(registry_areas))
+    if missing_registry_areas:
+        print(f"\n{YELLOW}⚠ Areas covered by tests but missing from FEATURE_REGISTRY.md:{RESET}")
+        for area in missing_registry_areas:
+            print(f"  - {area}")
     
     if in_progress:
         print(f"{YELLOW}⚠ Features in progress:{RESET}")
@@ -153,7 +269,10 @@ def print_report(scenarios: Dict[str, List[str]], registry: Dict[str, Tuple[str,
         for area, status, _ in planned:
             print(f"  - {area}: Start implementation")
     
-    print(f"\n{GREEN}✓ Next step:{RESET} Add XCUITest cases for implemented features")
+    if not uncovered_ids:
+        print(f"\n{GREEN}✓ Next step:{RESET} Expand XCUITest coverage beyond the happy path")
+    else:
+        print(f"\n{GREEN}✓ Next step:{RESET} Add XCUITest tags (e.g. @ON-001) to map more scenarios")
     print(f"  See issue #16 for testing infrastructure setup\n")
 
 
@@ -177,13 +296,17 @@ def main():
     # Parse registry
     print("Parsing FEATURE_REGISTRY.md...")
     registry = parse_feature_registry(registry_path)
+    registry_spec_paths = parse_feature_registry_spec_paths(registry_path)
     
     # Find Swift files
     print("Finding Swift implementation files...")
     swift_files = find_swift_files_for_features(ios_dir, list(scenarios.keys()))
+
+    print("Scanning iOS tests for scenario IDs...")
+    test_scenario_ids = parse_test_scenario_ids(ios_dir)
     
     # Print report
-    print_report(scenarios, registry, swift_files)
+    print_report(scenarios, registry, registry_spec_paths, swift_files, test_scenario_ids)
 
 
 if __name__ == "__main__":

@@ -12,12 +12,24 @@
 
 /* Begin PBXFileReference section */
 		210056442EFB1FFA005133E6 /* LanguageSpeakingTrainer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LanguageSpeakingTrainer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2867C0DC3C9C2F6FE026943A /* LanguageSpeakingTrainerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LanguageSpeakingTrainerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4EC68493B4CB9BDA1E5E926D /* LanguageSpeakingTrainerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LanguageSpeakingTrainerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		210056462EFB1FFA005133E6 /* LanguageSpeakingTrainer */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = LanguageSpeakingTrainer;
+			sourceTree = "<group>";
+		};
+		29072EA019036E55B5EB5C8F /* LanguageSpeakingTrainerTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LanguageSpeakingTrainerTests;
+			sourceTree = "<group>";
+		};
+		A1B6F2044CF131706B43253D /* LanguageSpeakingTrainerUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LanguageSpeakingTrainerUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -28,6 +40,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				210056942EFB3962005133E6 /* WebRTC in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36F48416703D638373ADEFF1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1E317C2A47E90CFF54B47A4D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +72,8 @@
 			isa = PBXGroup;
 			children = (
 				210056442EFB1FFA005133E6 /* LanguageSpeakingTrainer.app */,
+				2867C0DC3C9C2F6FE026943A /* LanguageSpeakingTrainerTests.xctest */,
+				4EC68493B4CB9BDA1E5E926D /* LanguageSpeakingTrainerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -77,6 +105,46 @@
 			productReference = 210056442EFB1FFA005133E6 /* LanguageSpeakingTrainer.app */;
 			productType = "com.apple.product-type.application";
 		};
+		32DB8F5EE4108FE63B7C9689 /* LanguageSpeakingTrainerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C4B1502D35336EFA705B36D9 /* Build configuration list for PBXNativeTarget "LanguageSpeakingTrainerTests" */;
+			buildPhases = (
+				A5D0697CA905B6CAB04FEC11 /* Sources */,
+				36F48416703D638373ADEFF1 /* Frameworks */,
+				3E63C091C7C6F842FD6EC9C4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				29072EA019036E55B5EB5C8F /* LanguageSpeakingTrainerTests */,
+			);
+			name = LanguageSpeakingTrainerTests;
+			productName = LanguageSpeakingTrainerTests;
+			productReference = 2867C0DC3C9C2F6FE026943A /* LanguageSpeakingTrainerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A8CA2F556CDAF39A28CD7250 /* LanguageSpeakingTrainerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3A3EC50B0484DA71548F1321 /* Build configuration list for PBXNativeTarget "LanguageSpeakingTrainerUITests" */;
+			buildPhases = (
+				CD9CAC573C5155FA33566E59 /* Sources */,
+				1E317C2A47E90CFF54B47A4D /* Frameworks */,
+				63FEA271430090B00F0E83A1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A1B6F2044CF131706B43253D /* LanguageSpeakingTrainerUITests */,
+			);
+			name = LanguageSpeakingTrainerUITests;
+			productName = LanguageSpeakingTrainerUITests;
+			productReference = 4EC68493B4CB9BDA1E5E926D /* LanguageSpeakingTrainerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -88,6 +156,12 @@
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					210056432EFB1FFA005133E6 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					32DB8F5EE4108FE63B7C9689 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					A8CA2F556CDAF39A28CD7250 = {
 						CreatedOnToolsVersion = 26.2;
 					};
 				};
@@ -110,12 +184,28 @@
 			projectRoot = "";
 			targets = (
 				210056432EFB1FFA005133E6 /* LanguageSpeakingTrainer */,
+				32DB8F5EE4108FE63B7C9689 /* LanguageSpeakingTrainerTests */,
+				A8CA2F556CDAF39A28CD7250 /* LanguageSpeakingTrainerUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		210056422EFB1FFA005133E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3E63C091C7C6F842FD6EC9C4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		63FEA271430090B00F0E83A1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -150,6 +240,20 @@
 
 /* Begin PBXSourcesBuildPhase section */
 		210056402EFB1FFA005133E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5D0697CA905B6CAB04FEC11 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CD9CAC573C5155FA33566E59 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -348,6 +452,76 @@
 			};
 			name = Release;
 		};
+		41B99CE4EFBEE469FABE584F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G69Z5BNY97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "LanguageSpeakingTrainerTests";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = trsdn.LanguageSpeakingTrainerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LanguageSpeakingTrainer.app/LanguageSpeakingTrainer";
+			};
+			name = Debug;
+		};
+		A0823DCA606429C46CB13FB6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G69Z5BNY97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "LanguageSpeakingTrainerTests";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = trsdn.LanguageSpeakingTrainerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LanguageSpeakingTrainer.app/LanguageSpeakingTrainer";
+			};
+			name = Release;
+		};
+		2F1CDA574D6431C3BEFBA891 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G69Z5BNY97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "LanguageSpeakingTrainerUITests";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = trsdn.LanguageSpeakingTrainerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = LanguageSpeakingTrainer;
+			};
+			name = Debug;
+		};
+		A415101624EC096C33D95876 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = G69Z5BNY97;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "LanguageSpeakingTrainerUITests";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = trsdn.LanguageSpeakingTrainerUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = LanguageSpeakingTrainer;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -365,6 +539,24 @@
 			buildConfigurations = (
 				210056502EFB1FFC005133E6 /* Debug */,
 				210056512EFB1FFC005133E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C4B1502D35336EFA705B36D9 /* Build configuration list for PBXNativeTarget "LanguageSpeakingTrainerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				41B99CE4EFBEE469FABE584F /* Debug */,
+				A0823DCA606429C46CB13FB6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3A3EC50B0484DA71548F1321 /* Build configuration list for PBXNativeTarget "LanguageSpeakingTrainerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2F1CDA574D6431C3BEFBA891 /* Debug */,
+				A415101624EC096C33D95876 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
