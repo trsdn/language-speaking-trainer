@@ -10,6 +10,23 @@
 		210056942EFB3962005133E6 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 210056932EFB3962005133E6 /* WebRTC */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		27A0C0C72F4D4B8B00A11111 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2100563C2EFB1FFA005133E6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 210056432EFB1FFA005133E6;
+			remoteInfo = LanguageSpeakingTrainer;
+		};
+		27A0C0C72F4D4B8B00A11112 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2100563C2EFB1FFA005133E6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 210056432EFB1FFA005133E6;
+			remoteInfo = LanguageSpeakingTrainer;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		210056442EFB1FFA005133E6 /* LanguageSpeakingTrainer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LanguageSpeakingTrainer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2867C0DC3C9C2F6FE026943A /* LanguageSpeakingTrainerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LanguageSpeakingTrainerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -126,6 +143,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				27A0C0C72F4D4B8B00A22221 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				29072EA019036E55B5EB5C8F /* LanguageSpeakingTrainerTests */,
@@ -146,6 +164,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				27A0C0C72F4D4B8B00A22222 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A1B6F2044CF131706B43253D /* LanguageSpeakingTrainerUITests */,
@@ -247,6 +266,19 @@
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		27A0C0C72F4D4B8B00A22221 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 210056432EFB1FFA005133E6 /* LanguageSpeakingTrainer */;
+			targetProxy = 27A0C0C72F4D4B8B00A11111 /* PBXContainerItemProxy */;
+		};
+		27A0C0C72F4D4B8B00A22222 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 210056432EFB1FFA005133E6 /* LanguageSpeakingTrainer */;
+			targetProxy = 27A0C0C72F4D4B8B00A11112 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXSourcesBuildPhase section */
 		210056402EFB1FFA005133E6 /* Sources */ = {

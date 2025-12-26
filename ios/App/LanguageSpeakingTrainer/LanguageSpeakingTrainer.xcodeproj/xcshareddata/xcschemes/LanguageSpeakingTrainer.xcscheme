@@ -29,6 +29,15 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "210056432EFB1FFA005133E6"
+            BuildableName = "LanguageSpeakingTrainer.app"
+            BlueprintName = "LanguageSpeakingTrainer"
+            ReferencedContainer = "container:LanguageSpeakingTrainer.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -51,15 +60,6 @@
             </BuildableReference>
          </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "210056432EFB1FFA005133E6"
-            BuildableName = "LanguageSpeakingTrainer.app"
-            BlueprintName = "LanguageSpeakingTrainer"
-            ReferencedContainer = "container:LanguageSpeakingTrainer.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
