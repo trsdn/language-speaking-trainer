@@ -44,6 +44,7 @@ struct HomeView: View {
             .buttonStyle(.borderedProminent)
             .padding(.horizontal)
             .disabled(appModel.selectedTopic == nil)
+            .accessibilityIdentifier("home.start")
 
             Spacer()
         }
@@ -77,11 +78,13 @@ struct HomeView: View {
                     TopicChip(title: topic.title, isSelected: appModel.selectedTopic == topic) {
                         appModel.selectedTopic = topic
                     }
+                    .accessibilityIdentifier("home.topic.\(topic.id)")
                 }
 
                 TopicChip(title: "Surprise", isSelected: false) {
                     appModel.selectedTopic = surpriseTopics.randomElement()
                 }
+                .accessibilityIdentifier("home.topic.surprise")
             }
             .padding(.vertical, 4)
 
@@ -90,6 +93,7 @@ struct HomeView: View {
                     .textInputAutocapitalization(.words)
                     .autocorrectionDisabled()
                     .textFieldStyle(.roundedBorder)
+                    .accessibilityIdentifier("home.customTopic")
 
                 Button("Set") {
                     let trimmed = customTopicText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -100,6 +104,7 @@ struct HomeView: View {
                     appModel.selectedTopic = .custom(trimmed)
                 }
                 .buttonStyle(.bordered)
+                .accessibilityIdentifier("home.setCustomTopic")
             }
         }
         .padding()

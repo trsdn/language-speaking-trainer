@@ -32,6 +32,7 @@ struct OnboardingView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .accessibilityIdentifier("onboarding.ageBand")
 
                 Text("English level")
                     .font(.headline)
@@ -46,6 +47,7 @@ struct OnboardingView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .accessibilityIdentifier("onboarding.englishLevel")
             }
             .padding()
             .background(.thinMaterial)
@@ -64,6 +66,7 @@ struct OnboardingView: View {
             .buttonStyle(.borderedProminent)
             .padding(.horizontal)
             .disabled(!canContinue)
+            .accessibilityIdentifier("onboarding.continue")
 
             Spacer()
 

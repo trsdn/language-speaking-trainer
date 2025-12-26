@@ -5,6 +5,9 @@ enum RealtimeClientFactory {
         modelPreference: RealtimeModelPreference = .realtimeMini,
         learnerContext: LearnerContext
     ) -> RealtimeSessionClient {
+        if AppConfig.isUITesting {
+            return MockRealtimeSessionClient()
+        }
         // Avoid silently falling back to the mock, because it looks like “WebRTC is broken”
         // when it’s really just misconfiguration. If you want the mock, build with:
         //   SWIFT_ACTIVE_COMPILATION_CONDITIONS += USE_MOCK_REALTIME

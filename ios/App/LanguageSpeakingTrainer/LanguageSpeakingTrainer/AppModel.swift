@@ -195,9 +195,20 @@ final class AppModel: ObservableObject {
     }
 
     init() {
+        if AppConfig.isUITesting, AppConfig.shouldResetStateOnLaunch {
+            Self.resetPersistentStateForUITests()
+        }
         onboarding = OnboardingSettings.load()
         realtimeModelPreference = Self.loadRealtimeModelPreference()
         learnerProfile = LearnerProfile.load()
+    }
+
+    private static func resetPersistentStateForUITests() {
+        let defaults = UserDefaults.standard
+        defaults.removeObject(forKey: OnboardingSettings.storageKey)
+        defaults.removeObject(forKey: LearnerProfile.storageKey)
+        defaults.removeObject(forKey: realtimeModelPreferenceKey)
+        defaults.synchronize()
     }
 
     var learnerContext: LearnerContext {

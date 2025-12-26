@@ -27,6 +27,7 @@ struct SessionView: View {
                 Text("Topic: \(topic.title)")
                     .font(.headline)
                     .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("session.topic")
 
                 Text("Your teacher")
                     .font(.largeTitle.weight(.bold))
@@ -61,6 +62,7 @@ struct SessionView: View {
                         .padding(.vertical, 12)
                 }
                 .buttonStyle(.bordered)
+                .accessibilityIdentifier("session.mute")
 
                 Button(role: .destructive) {
                     endSession()
@@ -70,6 +72,7 @@ struct SessionView: View {
                         .padding(.vertical, 12)
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("session.end")
             }
             .padding(.horizontal)
 
@@ -80,7 +83,9 @@ struct SessionView: View {
         .onAppear {
             sessionModel.start(topic: topic)
 
-            if !sessionModel.capturesMicrophone {
+            if AppConfig.isUITesting {
+                mic.stop()
+            } else if !sessionModel.capturesMicrophone {
                 mic.startIfPossible()
             } else {
                 mic.stop()

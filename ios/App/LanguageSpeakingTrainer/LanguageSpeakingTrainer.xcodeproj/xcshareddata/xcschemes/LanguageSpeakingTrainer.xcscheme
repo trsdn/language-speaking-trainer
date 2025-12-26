@@ -29,6 +29,37 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "32DB8F5EE4108FE63B7C9689"
+               BuildableName = "LanguageSpeakingTrainerTests.xctest"
+               BlueprintName = "LanguageSpeakingTrainerTests"
+               ReferencedContainer = "container:LanguageSpeakingTrainer.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A8CA2F556CDAF39A28CD7250"
+               BuildableName = "LanguageSpeakingTrainerUITests.xctest"
+               BlueprintName = "LanguageSpeakingTrainerUITests"
+               ReferencedContainer = "container:LanguageSpeakingTrainer.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "210056432EFB1FFA005133E6"
+            BuildableName = "LanguageSpeakingTrainer.app"
+            BlueprintName = "LanguageSpeakingTrainer"
+            ReferencedContainer = "container:LanguageSpeakingTrainer.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -50,13 +81,6 @@
             ReferencedContainer = "container:LanguageSpeakingTrainer.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "TOKEN_SERVICE_SHARED_SECRET"
-            value = "INAP3zR7dCl2Zi5dcz10kaOZuicwMZ5yI-OTRJN2DgM"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
