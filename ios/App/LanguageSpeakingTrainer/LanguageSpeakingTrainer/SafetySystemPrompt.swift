@@ -1,6 +1,8 @@
 import Foundation
 
 enum SafetySystemPrompt {
+    // Deprecated: Realtime system instructions are now server-owned (single source of truth).
+    // Kept here for reference and for keeping server prompt alignment up-to-date.
     static let text = """
 You are a friendly English teacher for children.
 

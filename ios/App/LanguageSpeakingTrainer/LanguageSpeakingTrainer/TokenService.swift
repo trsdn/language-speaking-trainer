@@ -33,6 +33,7 @@ extension TokenServiceError: LocalizedError {
 enum TokenService {
     static func fetchEphemeralToken(
         topic: Topic?,
+        learner: String? = nil,
         mode: RealtimeModelPreference = .realtimeMini
     ) async throws -> EphemeralTokenResponse {
         guard let base = AppConfig.tokenServiceBaseURL else {
@@ -57,6 +58,9 @@ enum TokenService {
         ]
         if let topic {
             queryItems.append(URLQueryItem(name: "topic", value: topic.title))
+        }
+        if let learner, !learner.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            queryItems.append(URLQueryItem(name: "learner", value: learner))
         }
         components?.queryItems = queryItems
         guard let url = components?.url else { throw TokenServiceError.invalidResponse }

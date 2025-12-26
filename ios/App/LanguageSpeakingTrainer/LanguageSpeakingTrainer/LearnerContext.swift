@@ -5,6 +5,34 @@ struct LearnerContext: Equatable {
     let englishLevel: EnglishLevel?
     let profile: LearnerProfile
 
+    /// Settings-derived learner context (only fields configured on the Settings screen).
+    /// This is intended to be sent to the backend token endpoint as a compact hint (not as system instructions).
+    func settingsSnippet() -> String {
+        var lines: [String] = []
+
+        if let age = profile.age {
+            lines.append("- Age: \(age)")
+        }
+        if let schoolType = profile.schoolType {
+            lines.append("- School type: \(schoolType.displayName)")
+        }
+        if let country = profile.country {
+            lines.append("- Country: \(country.displayName)")
+        }
+        if let bundesland = profile.bundesland {
+            lines.append("- Bundesland: \(bundesland.displayName)")
+        }
+        if let customCountryName = profile.customCountryName {
+            lines.append("- Custom country name: \(customCountryName)")
+        }
+        if let region = profile.region {
+            lines.append("- Region/State: \(region)")
+        }
+
+        guard !lines.isEmpty else { return "" }
+        return "Learner settings:\n" + lines.joined(separator: "\n")
+    }
+
     /// Human-readable, non-identifying context that can be embedded into a system prompt.
     func promptSnippet() -> String {
         var lines: [String] = []

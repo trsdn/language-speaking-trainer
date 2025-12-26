@@ -372,22 +372,6 @@ extension OpenAIWebRTCSession: RTCDataChannelDelegate {
     func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
         if dataChannel.readyState == .open {
             onEvent(.systemNote("Events channel ready."))
-
-            // Keep us on-topic (in case server-side instructions were minimal):
-            let learnerSnippet = learnerContext.promptSnippet()
-            var instructions = SafetySystemPrompt.text.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !learnerSnippet.isEmpty {
-                instructions += "\n\n" + learnerSnippet
-            }
-            instructions += "\n\nTopic: \(topic.title). Greet first and ask one simple question."
-
-            sendClientEvent([
-                "type": "session.update",
-                "session": [
-                    "type": "realtime",
-                    "instructions": instructions,
-                ]
-            ])
         }
     }
 

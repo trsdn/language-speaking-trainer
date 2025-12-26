@@ -11,7 +11,12 @@ This repo includes a minimal Vercel backend to mint **ephemeral Realtime client 
 ## Endpoints
 
 - `GET /api/health` → `{ ok: true }`
-- `GET /api/realtime/token?topic=Space` → `{ value, expires_at, session }`
+- `GET /api/realtime/token?topic=Space&learner=...` → `{ value, expires_at, session }`
+
+Notes:
+
+- Realtime **system instructions are composed server-side** and embedded into the minted session.
+- Clients should only pass lightweight context via query params (e.g. `topic`, `learner`).
 
 ### Authentication (MVP shared secret)
 

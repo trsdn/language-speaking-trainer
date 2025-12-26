@@ -43,7 +43,12 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
                 }
                 #endif
 
-                let token = try await TokenService.fetchEphemeralToken(topic: topic, mode: modelPreference)
+                let learner = learnerContext.settingsSnippet()
+                let token = try await TokenService.fetchEphemeralToken(
+                    topic: topic,
+                    learner: learner,
+                    mode: modelPreference
+                )
                 guard !stopped else { return }
 
                 #if canImport(WebRTC)
