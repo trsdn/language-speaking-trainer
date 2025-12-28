@@ -16,9 +16,9 @@ extension TokenServiceError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingBaseURL:
-            return "Missing TOKEN_SERVICE_BASE_URL"
+            return "Missing TOKEN_SERVICE_BASE_URL. Set it in the app target Build Settings (User-Defined) or in Info.plist via the Info.plist template. Example: https://your-vercel-app.vercel.app"
         case .missingSharedSecret:
-            return "Missing TOKEN_SERVICE_SHARED_SECRET"
+            return "Missing TOKEN_SERVICE_SHARED_SECRET. Set it as an Xcode Scheme environment variable (Run → Arguments → Environment Variables) named TOKEN_SERVICE_SHARED_SECRET, or set the app target Build Setting TOKEN_SERVICE_SHARED_SECRET so Info.plist can expand $(TOKEN_SERVICE_SHARED_SECRET)."
         case .invalidResponse:
             return "Invalid response from token service"
         case .httpError(let status, let body):

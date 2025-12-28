@@ -32,6 +32,17 @@ Optional (for later Realtime token minting):
 - `TOKEN_SERVICE_BASE_URL`: `https://your-vercel-app.vercel.app`
 - `TOKEN_SERVICE_SHARED_SECRET`: a shared secret that the backend requires on `/api/realtime/token`
 
+How to set these (recommended for local dev):
+
+1. In Xcode, select the app scheme → **Edit Scheme…**
+2. Run → **Arguments** → **Environment Variables**
+3. Add:
+
+- `TOKEN_SERVICE_BASE_URL` (example: `https://language-speaking-trainer.vercel.app`)
+- `TOKEN_SERVICE_SHARED_SECRET` (must match the backend `TOKEN_SERVICE_SHARED_SECRET`)
+
+Alternative: set these as **User-Defined** Build Settings on the app target (so the Info.plist entries can expand `$(TOKEN_SERVICE_BASE_URL)` and `$(TOKEN_SERVICE_SHARED_SECRET)`).
+
 Note: This is MVP protection suitable for a single-user/private deployment. For a public app, a shipped secret can be extracted.
 
 Note: there is an older scaffold folder at `ios/LanguageSpeakingTrainer/` from before the `.xcodeproj` existed. The canonical sources going forward are the ones inside the Xcode project folder under `ios/App/...`.
