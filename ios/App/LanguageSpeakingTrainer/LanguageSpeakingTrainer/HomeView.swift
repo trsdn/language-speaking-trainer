@@ -6,8 +6,6 @@ struct HomeView: View {
     @State private var customTopicText: String = ""
     @State private var validationMessage: String? = nil
 
-    private let surpriseTopics: [Topic] = Topic.presets
-
     private static let topicGridColumns: [GridItem] = [
         GridItem(.adaptive(minimum: 120), spacing: 10, alignment: .leading)
     ]
@@ -15,14 +13,18 @@ struct HomeView: View {
     var body: some View {
         VStack(spacing: 16) {
             VStack(spacing: 8) {
-                Text("Practice speaking")
-                    .font(.largeTitle.weight(.bold))
+                HStack(spacing: 10) {
+                    LogoMarkView(size: 28)
+
+                    Text("Practice speaking")
+                        .font(.title.weight(.bold))
+                }
 
                 Text("Choose a topic and start")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            .padding(.top, 16)
+            .padding(.top, 8)
 
             topicPicker
 
@@ -33,6 +35,26 @@ struct HomeView: View {
                     .padding(.horizontal)
             }
 
+            Spacer()
+        }
+        .padding(.horizontal)
+        .padding(.top, 8)
+        // Avoid the default translucent navigation bar drawing over our custom header.
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    SettingsView()
+                } label: {
+                    Image(systemName: "gearshape")
+                        .imageScale(.medium)
+                }
+                .accessibilityLabel("Settings")
+            }
+        }
+        // Keep the primary action visible above the home indicator.
+        .safeAreaInset(edge: .bottom) {
             NavigationLink {
                 SessionView(
                     topic: appModel.selectedTopic ?? Topic.presets[0],
@@ -42,28 +64,15 @@ struct HomeView: View {
             } label: {
                 Text("Start")
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
+                    .padding(.vertical, 12)
                     .font(.headline)
             }
             .buttonStyle(.borderedProminent)
-            .padding(.horizontal)
             .disabled(appModel.selectedTopic == nil)
             .accessibilityIdentifier("home.start")
-
-            Spacer()
-        }
-        .padding(.horizontal)
-        .navigationTitle("Home")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    SettingsView()
-                } label: {
-                    Image(systemName: "gearshape")
-                }
-                .accessibilityLabel("Settings")
-            }
+            .padding(.horizontal)
+            .padding(.bottom, 8)
+            .background(.clear)
         }
         .onChange(of: appModel.selectedTopic) { _, _ in
             validationMessage = nil
@@ -82,13 +91,8 @@ struct HomeView: View {
                     }
                     .accessibilityIdentifier("home.topic.\(topic.id)")
                 }
-
-                TopicChip(title: "Surprise", isSelected: false) {
-                    appModel.selectedTopic = surpriseTopics.randomElement()
-                }
-                .accessibilityIdentifier("home.topic.surprise")
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, 2)
 
             HStack(spacing: 8) {
                 TextField("Custom topic (e.g. Space)", text: $customTopicText)
@@ -109,7 +113,7 @@ struct HomeView: View {
                 .accessibilityIdentifier("home.setCustomTopic")
             }
         }
-        .padding()
+        .padding(12)
         .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
@@ -126,9 +130,9 @@ private struct TopicChip: View {
                 .font(.subheadline.weight(.semibold))
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
-                .frame(maxWidth: .infinity, minHeight: 36)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity, minHeight: 30)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
         }
         .buttonStyle(.bordered)
         .tint(isSelected ? .blue : .gray)
