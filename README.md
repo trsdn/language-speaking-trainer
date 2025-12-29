@@ -1,35 +1,57 @@
 # Language Speaking Trainer
 
-Native iOS (SwiftUI) app for a kids-friendly English speaking trainer.
+Native iOS (**SwiftUI**) app for a kids‑friendly English speaking trainer.
 
-## What’s in this repo
+![App screenshot](docs/screen.png)
 
-- `features/` — BDD/Gherkin acceptance criteria (scenario IDs like `@SE-001`).
-- `ios/` — native iOS implementation scaffold (SwiftUI).
-- `api/` — Vercel serverless functions (ephemeral token minting).
+## What this does
 
-See `features/FEATURE_REGISTRY.md` for a single place that tracks what’s specified vs implemented.
+- Pick a topic (or enter a custom one)
+- Start a speaking session
+- Keep the flow simple and age‑appropriate
 
-## iOS app status
+## Repo layout
 
-Implemented UI flows matching MVP BDD:
+- `ios/` — the iOS app (SwiftUI)
+- `api/` — Vercel serverless functions (ephemeral token minting)
+- `features/` — BDD/Gherkin acceptance criteria (scenario IDs like `@SE-001`)
+- `docs/` — backend + iOS setup notes
 
-- Onboarding: `@ON-001..@ON-003`
-- Home/topic selection: `@HO-001..@HO-005`
-- Session UI: `@SE-001` + `@SE-004` + `@SE-005`
-- Privacy: `@DA-001` (no long-term raw audio storage — nothing is persisted)
+If you want a single “what’s planned vs what’s implemented” index, see `features/FEATURE_REGISTRY.md`.
+
+## Current status
+
+Implemented UI flows matching the MVP BDD:
+
+- Home/topic selection
+- Settings
+- Session UI
+- Privacy constraints: no long‑term raw audio storage (nothing is persisted)
 
 Not implemented yet:
 
-- OpenAI Realtime WebRTC connection (currently mocked)
+- Full OpenAI Realtime WebRTC connection (some parts are mocked / in progress)
 
-## Backend
+## Run it locally
 
-See `docs/backend-vercel.md`.
+### iOS app
 
-## Run locally
+You need **Xcode**.
 
-You need **Xcode** installed.
+- Open: `ios/App/LanguageSpeakingTrainer/LanguageSpeakingTrainer.xcodeproj`
+- Run the `LanguageSpeakingTrainer` scheme on a simulator or your device
 
-See `ios/README.md` for the quickest way to open and run the app.
+iOS setup details (including token service configuration) live in `ios/README.md`.
+
+### Backend (Vercel)
+
+The backend lives in `api/` and is designed to run on Vercel.
+
+- Docs: `docs/backend-vercel.md`
+- Local dev is typically via `vercel dev` (see `vercel.json`)
+
+## Branding / assets
+
+The app icon and the in‑app logo mark are derived from Google **Material Symbols** (`emoji_language`).
+Attribution and license notes are in `docs/brand/THIRD_PARTY_NOTICES.md`.
 
