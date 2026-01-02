@@ -7,7 +7,6 @@ struct SettingsView: View {
     @State private var ageError: String? = nil
     @FocusState private var isAgeFieldFocused: Bool
 
-    @State private var tokenServiceSharedSecretDraft: String = ""
     @State private var openAIAPIKeyDraft: String = ""
 
     var body: some View {
@@ -84,60 +83,6 @@ struct SettingsView: View {
             }
 
             Section {
-                TextField("Token service base URL", text: $appModel.tokenServiceBaseURLOverride)
-                    .keyboardType(.URL)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-
-                Text("Example: https://your-vercel-app.vercel.app")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-
-                Divider()
-
-                if appModel.hasTokenServiceSharedSecret {
-                    LabeledContent("Shared secret") {
-                        Text("Saved")
-                            .foregroundStyle(.secondary)
-                    }
-                } else {
-                    LabeledContent("Shared secret") {
-                        Text("Not set")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                SecureField(appModel.hasTokenServiceSharedSecret ? "Enter new shared secret" : "Enter shared secret", text: $tokenServiceSharedSecretDraft)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .textContentType(.password)
-
-                HStack {
-                    Button("Save") {
-                        appModel.storeTokenServiceSharedSecret(tokenServiceSharedSecretDraft)
-                        tokenServiceSharedSecretDraft = ""
-                    }
-                    .disabled(tokenServiceSharedSecretDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-
-                    Spacer()
-
-                    Button("Clear", role: .destructive) {
-                        appModel.clearTokenServiceSharedSecret()
-                        tokenServiceSharedSecretDraft = ""
-                    }
-                    .disabled(!appModel.hasTokenServiceSharedSecret)
-                }
-
-                Text("For safety, the stored secret cannot be displayed again. To change it, enter a new value and tap Save.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            } header: {
-                Text("Token service")
-            } footer: {
-                Text("If a secret is stored here, the app will use it for /api/realtime/token requests instead of Info.plist or Xcode scheme environment variables.")
-            }
-
-            Section {
                 if appModel.hasOpenAIAPIKey {
                     LabeledContent("API key") {
                         Text("Saved")
@@ -177,7 +122,7 @@ struct SettingsView: View {
             } header: {
                 Text("OpenAI (BYOK)")
             } footer: {
-                Text("Dev/personal use only: storing an API key on-device can be risky. If a key is set here, the app will mint Realtime client secrets directly from OpenAI and will not require the Vercel token service.")
+                Text("Dev/personal use only: storing an API key on-device can be risky. If a key is set here, the app will mint Realtime client secrets directly from OpenAI.")
             }
         }
         .navigationTitle("Settings")

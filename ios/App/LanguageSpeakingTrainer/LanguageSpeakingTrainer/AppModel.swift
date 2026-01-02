@@ -270,18 +270,6 @@ final class AppModel: ObservableObject {
         }
     }
 
-    /// Optional local override to avoid having to configure TOKEN_SERVICE_BASE_URL via Xcode.
-    /// This is not a secret and is stored in UserDefaults.
-    @Published var tokenServiceBaseURLOverride: String {
-        didSet {
-            persistTokenServiceBaseURLOverride(tokenServiceBaseURLOverride)
-        }
-    }
-
-    /// Whether a token service shared secret is stored on this device.
-    /// We intentionally never expose the stored value via the UI.
-    @Published private(set) var hasTokenServiceSharedSecret: Bool
-
     /// Whether an OpenAI API key is stored on this device (BYOK mode).
     /// We intentionally never expose the stored value via the UI.
     @Published private(set) var hasOpenAIAPIKey: Bool
@@ -312,15 +300,10 @@ final class AppModel: ObservableObject {
 
         let initialRealtimePref = Self.loadRealtimeModelPreference()
         let initialLearnerProfile = LearnerProfile.load()
-
-        let initialBaseURLOverride = Self.loadTokenServiceBaseURLOverride()
-        let initialHasSecret = Self.loadHasTokenServiceSharedSecret()
         let initialHasOpenAIKey = Self.loadHasOpenAIAPIKey()
 
         onboarding = initialOnboarding
         realtimeModelPreference = initialRealtimePref
-        tokenServiceBaseURLOverride = initialBaseURLOverride
-        hasTokenServiceSharedSecret = initialHasSecret
         hasOpenAIAPIKey = initialHasOpenAIKey
         learnerProfile = initialLearnerProfile
     }
@@ -330,11 +313,9 @@ final class AppModel: ObservableObject {
         defaults.removeObject(forKey: OnboardingSettings.storageKey)
         defaults.removeObject(forKey: LearnerProfile.storageKey)
         defaults.removeObject(forKey: realtimeModelPreferenceKey)
-        defaults.removeObject(forKey: tokenServiceBaseURLOverrideKey)
         defaults.synchronize()
 
         // Best-effort: also clear Keychain secrets so UITests don't leak state between runs.
-        try? KeychainStore.delete(.tokenServiceSharedSecret)
         try? KeychainStore.delete(.openAIAPIKey)
     }
 
@@ -369,8 +350,6 @@ final class AppModel: ObservableObject {
 
     private static let realtimeModelPreferenceKey = "realtime.model.preference.v1"
 
-    private static let tokenServiceBaseURLOverrideKey = "token.service.baseURL.override.v1"
-
     private static func loadRealtimeModelPreference() -> RealtimeModelPreference {
         guard let raw = UserDefaults.standard.string(forKey: realtimeModelPreferenceKey) else {
             return .realtimeMini
@@ -382,49 +361,9 @@ final class AppModel: ObservableObject {
         UserDefaults.standard.set(pref.rawValue, forKey: Self.realtimeModelPreferenceKey)
     }
 
-    private static func loadTokenServiceBaseURLOverride() -> String {
-        let raw = UserDefaults.standard.string(forKey: tokenServiceBaseURLOverrideKey) ?? ""
-        return raw.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private func persistTokenServiceBaseURLOverride(_ raw: String) {
-        let v = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        if v.isEmpty {
-            UserDefaults.standard.removeObject(forKey: Self.tokenServiceBaseURLOverrideKey)
-        } else {
-            UserDefaults.standard.set(v, forKey: Self.tokenServiceBaseURLOverrideKey)
-        }
-    }
-
-    private static func loadHasTokenServiceSharedSecret() -> Bool {
-        let v = KeychainStore.readString(for: .tokenServiceSharedSecret)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return !v.isEmpty
-    }
-
     private static func loadHasOpenAIAPIKey() -> Bool {
         let v = KeychainStore.readString(for: .openAIAPIKey)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return !v.isEmpty
-    }
-
-    func storeTokenServiceSharedSecret(_ secret: String) {
-        let v = secret.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !v.isEmpty else { return }
-        do {
-            try KeychainStore.writeString(v, for: .tokenServiceSharedSecret)
-            hasTokenServiceSharedSecret = true
-        } catch {
-            // Intentionally do not log the secret.
-            // For now we silently ignore; can be surfaced in UI later if needed.
-        }
-    }
-
-    func clearTokenServiceSharedSecret() {
-        do {
-            try KeychainStore.delete(.tokenServiceSharedSecret)
-        } catch {
-            // Ignore failures; we still recompute.
-        }
-        hasTokenServiceSharedSecret = Self.loadHasTokenServiceSharedSecret()
     }
 
     func storeOpenAIAPIKey(_ apiKey: String) {

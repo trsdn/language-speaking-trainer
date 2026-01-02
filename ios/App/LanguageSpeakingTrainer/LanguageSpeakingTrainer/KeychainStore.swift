@@ -7,7 +7,6 @@ import Security
 /// The app still needs read access internally to make authenticated requests.
 enum KeychainStore {
     enum SecretKey: String {
-        case tokenServiceSharedSecret = "token_service_shared_secret"
         // Reserved for future BYOK support:
         case openAIAPIKey = "openai_api_key"
     }
