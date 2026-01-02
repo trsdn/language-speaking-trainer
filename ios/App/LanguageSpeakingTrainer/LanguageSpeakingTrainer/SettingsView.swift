@@ -7,6 +7,8 @@ struct SettingsView: View {
     @State private var ageError: String? = nil
     @FocusState private var isAgeFieldFocused: Bool
 
+    @State private var openAIAPIKeyDraft: String = ""
+
     var body: some View {
         Form {
             Section {
@@ -78,6 +80,49 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             } header: {
                 Text("Learner")
+            }
+
+            Section {
+                if appModel.hasOpenAIAPIKey {
+                    LabeledContent("API key") {
+                        Text("Saved")
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
+                    LabeledContent("API key") {
+                        Text("Not set")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                SecureField(appModel.hasOpenAIAPIKey ? "Enter new OpenAI API key" : "Enter OpenAI API key", text: $openAIAPIKeyDraft)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .textContentType(.password)
+
+                HStack {
+                    Button("Save") {
+                        appModel.storeOpenAIAPIKey(openAIAPIKeyDraft)
+                        openAIAPIKeyDraft = ""
+                    }
+                    .disabled(openAIAPIKeyDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                    Spacer()
+
+                    Button("Clear", role: .destructive) {
+                        appModel.clearOpenAIAPIKey()
+                        openAIAPIKeyDraft = ""
+                    }
+                    .disabled(!appModel.hasOpenAIAPIKey)
+                }
+
+                Text("For safety, the stored key cannot be displayed again. To change it, enter a new value and tap Save.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("OpenAI (BYOK)")
+            } footer: {
+                Text("Dev/personal use only: storing an API key on-device can be risky. If a key is set here, the app will mint Realtime client secrets directly from OpenAI.")
             }
         }
         .navigationTitle("Settings")

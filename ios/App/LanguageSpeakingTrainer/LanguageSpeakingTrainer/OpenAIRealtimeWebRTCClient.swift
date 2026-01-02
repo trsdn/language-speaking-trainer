@@ -36,10 +36,10 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
             do {
                 #if DEBUG && canImport(WebRTC)
                 // Log configuration info to OSLog for debugging (not visible in UI)
-                if let base = AppConfig.tokenServiceBaseURL {
-                    logger.debug("Token service configured: \(base.absoluteString, privacy: .public)")
+                if AppConfig.openAIAPIKey != nil {
+                    logger.debug("OpenAI BYOK key is configured (will mint client secrets directly)")
                 } else {
-                    logger.warning("Token service not configured (missing TOKEN_SERVICE_BASE_URL in Info.plist)")
+                    logger.warning("OpenAI BYOK key is not configured (Settings → OpenAI (BYOK))")
                 }
                 #endif
 

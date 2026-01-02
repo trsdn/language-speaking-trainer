@@ -270,6 +270,10 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Whether an OpenAI API key is stored on this device (BYOK mode).
+    /// We intentionally never expose the stored value via the UI.
+    @Published private(set) var hasOpenAIAPIKey: Bool
+
     @Published var learnerProfile: LearnerProfile {
         didSet {
             let sanitized = learnerProfile.sanitized()
@@ -296,9 +300,11 @@ final class AppModel: ObservableObject {
 
         let initialRealtimePref = Self.loadRealtimeModelPreference()
         let initialLearnerProfile = LearnerProfile.load()
+        let initialHasOpenAIKey = Self.loadHasOpenAIAPIKey()
 
         onboarding = initialOnboarding
         realtimeModelPreference = initialRealtimePref
+        hasOpenAIAPIKey = initialHasOpenAIKey
         learnerProfile = initialLearnerProfile
     }
 
@@ -308,6 +314,9 @@ final class AppModel: ObservableObject {
         defaults.removeObject(forKey: LearnerProfile.storageKey)
         defaults.removeObject(forKey: realtimeModelPreferenceKey)
         defaults.synchronize()
+
+        // Best-effort: also clear Keychain secrets so UITests don't leak state between runs.
+        try? KeychainStore.delete(.openAIAPIKey)
     }
 
     var learnerContext: LearnerContext {
@@ -350,6 +359,31 @@ final class AppModel: ObservableObject {
 
     private func persistRealtimeModelPreference(_ pref: RealtimeModelPreference) {
         UserDefaults.standard.set(pref.rawValue, forKey: Self.realtimeModelPreferenceKey)
+    }
+
+    private static func loadHasOpenAIAPIKey() -> Bool {
+        let v = KeychainStore.readString(for: .openAIAPIKey)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return !v.isEmpty
+    }
+
+    func storeOpenAIAPIKey(_ apiKey: String) {
+        let v = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !v.isEmpty else { return }
+        do {
+            try KeychainStore.writeString(v, for: .openAIAPIKey)
+            hasOpenAIAPIKey = true
+        } catch {
+            // Intentionally do not log the key.
+        }
+    }
+
+    func clearOpenAIAPIKey() {
+        do {
+            try KeychainStore.delete(.openAIAPIKey)
+        } catch {
+            // Ignore failures; we still recompute.
+        }
+        hasOpenAIAPIKey = Self.loadHasOpenAIAPIKey()
     }
 }
 
