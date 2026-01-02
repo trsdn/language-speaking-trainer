@@ -9,6 +9,9 @@ enum KeychainStore {
     enum SecretKey: String {
         // Reserved for future BYOK support:
         case openAIAPIKey = "openai_api_key"
+
+        // Google Gemini (Live API) BYOK key.
+        case googleAPIKey = "google_api_key"
     }
 
     private static var service: String {

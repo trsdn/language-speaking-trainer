@@ -62,14 +62,14 @@ final class OpenAIRealtimeWebRTCClient: RealtimeSessionClient {
                 self.session = s
                 s.start()
                 #else
-                onEvent(.systemNote("Token fetched (ephemeral client secret). Add a WebRTC SDK module named 'WebRTC' to enable realtime audio."))
-                onEvent(.systemNote("(Ephemeral token expires at: \(token.expires_at ?? 0))"))
+                onEvent(.system("Token fetched (ephemeral client secret). Add a WebRTC SDK module named 'WebRTC' to enable realtime audio."))
+                onEvent(.system("(Ephemeral token expires at: \(token.expires_at ?? 0))"))
                 onEvent(.connected)
                 onEvent(.teacherMessage("Hi! (Mocked) I’m ready, but WebRTC isn’t enabled yet. Once enabled, I’ll speak first about \(topic.title)."))
                 #endif
             } catch {
                 guard !stopped else { return }
-                onEvent(.systemNote("Failed to start realtime session: \(error.localizedDescription)"))
+                onEvent(.error("Failed to start realtime session: \(error.localizedDescription)"))
             }
         }
     }
