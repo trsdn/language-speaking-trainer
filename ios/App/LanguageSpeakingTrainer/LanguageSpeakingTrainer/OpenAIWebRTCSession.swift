@@ -58,7 +58,7 @@ final class OpenAIWebRTCSession: NSObject {
     }
 
     func start() {
-        onEvent(.systemNote("Starting WebRTC session…"))
+        onEvent(.system("Starting WebRTC session…"))
 
         configureCallAudioSession()
 
@@ -77,7 +77,7 @@ final class OpenAIWebRTCSession: NSObject {
         )
 
         guard let pc = factory.peerConnection(with: config, constraints: constraints, delegate: self) else {
-            onEvent(.systemNote("Failed to create RTCPeerConnection."))
+            onEvent(.error("Failed to create RTCPeerConnection."))
             return
         }
         self.pc = pc
@@ -98,7 +98,7 @@ final class OpenAIWebRTCSession: NSObject {
             dc.delegate = self
             dataChannel = dc
         } else {
-            onEvent(.systemNote("Failed to create data channel."))
+            onEvent(.error("Failed to create data channel."))
         }
 
         let offerConstraints = RTCMediaConstraints(
@@ -111,7 +111,7 @@ final class OpenAIWebRTCSession: NSObject {
         pc.offer(for: offerConstraints) { [weak self] offer, error in
             guard let self else { return }
             if let error {
-                self.onEvent(.systemNote("Failed to create offer: \(error.localizedDescription)"))
+                self.onEvent(.error("Failed to create offer: \(error.localizedDescription)"))
                 return
             }
             guard let offer, !self.isStopped else { return }
@@ -119,7 +119,7 @@ final class OpenAIWebRTCSession: NSObject {
             pc.setLocalDescription(offer) { [weak self] error in
                 guard let self else { return }
                 if let error {
-                    self.onEvent(.systemNote("Failed to set local description: \(error.localizedDescription)"))
+                    self.onEvent(.error("Failed to set local description: \(error.localizedDescription)"))
                     return
                 }
                 guard let sdp = offer.sdp as String?, !self.isStopped else { return }
@@ -153,7 +153,7 @@ final class OpenAIWebRTCSession: NSObject {
         localAudioTrack = nil
         audioSender = nil
 
-        onEvent(.systemNote("WebRTC session stopped."))
+        onEvent(.system("WebRTC session stopped."))
     }
 
     private func configureCallAudioSession() {
@@ -163,7 +163,7 @@ final class OpenAIWebRTCSession: NSObject {
 
             // Speaker-first unless a headset/external output is connected.
             // `.defaultToSpeaker` prevents the “earpiece” (receiver) default.
-            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetooth])
+            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothHFP])
             try session.setMode(.voiceChat)
             try session.setActive(true)
 
@@ -182,7 +182,7 @@ final class OpenAIWebRTCSession: NSObject {
                 }
             }
         } catch {
-            onEvent(.systemNote("Audio session setup warning: \(error.localizedDescription)"))
+            onEvent(.system("Audio session setup warning: \(error.localizedDescription)"))
         }
     }
 
@@ -221,12 +221,12 @@ final class OpenAIWebRTCSession: NSObject {
     private func exchangeSDP(offerSDP: String) async {
         guard !isStopped else { return }
 
-        onEvent(.systemNote("Exchanging SDP with OpenAI…"))
+        onEvent(.system("Exchanging SDP with OpenAI…"))
 
         // Per WebRTC guide: POST raw SDP with Content-Type: application/sdp and Authorization: Bearer <EPHEMERAL_KEY>
         // Response body: SDP answer (text).
         guard let url = URL(string: "https://api.openai.com/v1/realtime/calls") else {
-            onEvent(.systemNote("Invalid OpenAI calls URL."))
+            onEvent(.error("Invalid OpenAI calls URL."))
             return
         }
 
@@ -239,18 +239,18 @@ final class OpenAIWebRTCSession: NSObject {
         do {
             let (data, resp) = try await URLSession.shared.data(for: req)
             guard let http = resp as? HTTPURLResponse else {
-                onEvent(.systemNote("No HTTP response from OpenAI."))
+                onEvent(.error("No HTTP response from OpenAI."))
                 return
             }
             guard (200..<300).contains(http.statusCode) else {
                 let body = String(data: data, encoding: .utf8) ?? ""
-                onEvent(.systemNote("OpenAI calls failed (\(http.statusCode)): \(body)"))
+                onEvent(.error("OpenAI calls failed (\(http.statusCode)): \(body)"))
                 return
             }
 
             let answerSDP = String(data: data, encoding: .utf8) ?? ""
             if answerSDP.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                onEvent(.systemNote("OpenAI returned an empty SDP answer."))
+                onEvent(.error("OpenAI returned an empty SDP answer."))
                 return
             }
 
@@ -260,7 +260,7 @@ final class OpenAIWebRTCSession: NSObject {
             pc.setRemoteDescription(answer) { [weak self] error in
                 guard let self else { return }
                 if let error {
-                    self.onEvent(.systemNote("Failed to set remote description: \(error.localizedDescription)"))
+                    self.onEvent(.error("Failed to set remote description: \(error.localizedDescription)"))
                     return
                 }
 
@@ -275,7 +275,7 @@ final class OpenAIWebRTCSession: NSObject {
                 ])
             }
         } catch {
-            onEvent(.systemNote("SDP exchange failed: \(error.localizedDescription)"))
+            onEvent(.error("SDP exchange failed: \(error.localizedDescription)"))
         }
     }
 
@@ -291,10 +291,10 @@ final class OpenAIWebRTCSession: NSObject {
 
         switch type {
         case "session.created":
-            onEvent(.systemNote("Session created."))
+            onEvent(.system("Session created."))
 
         case "session.updated":
-            onEvent(.systemNote("Session updated."))
+            onEvent(.system("Session updated."))
 
         case "response.output_text.delta":
             if
@@ -319,7 +319,7 @@ final class OpenAIWebRTCSession: NSObject {
 
         case "error", "invalid_request_error":
             let message = (json["message"] as? String) ?? (json["error"] as? String) ?? "Unknown error"
-            onEvent(.systemNote("Realtime error: \(message)"))
+            onEvent(.error("Realtime error: \(message)"))
 
         default:
             // Keep noise low; uncomment while debugging:
@@ -339,7 +339,7 @@ extension OpenAIWebRTCSession: RTCPeerConnectionDelegate {
 
     func peerConnection(_ peerConnection: RTCPeerConnection, didChange newState: RTCIceConnectionState) {
         if newState == .connected || newState == .completed {
-            onEvent(.systemNote("ICE connected."))
+            onEvent(.system("ICE connected."))
         }
     }
 
@@ -349,7 +349,7 @@ extension OpenAIWebRTCSession: RTCPeerConnectionDelegate {
     func peerConnection(_ peerConnection: RTCPeerConnection, didOpen dataChannel: RTCDataChannel) {
         dataChannel.delegate = self
         self.dataChannel = dataChannel
-        onEvent(.systemNote("Data channel opened."))
+        onEvent(.system("Data channel opened."))
     }
 
     func peerConnection(_ peerConnection: RTCPeerConnection, didStartReceivingOn transceiver: RTCRtpTransceiver) {}
@@ -357,12 +357,12 @@ extension OpenAIWebRTCSession: RTCPeerConnectionDelegate {
     func peerConnection(_ peerConnection: RTCPeerConnection, didAdd rtpReceiver: RTCRtpReceiver, streams: [RTCMediaStream]) {
         // Remote audio arrives here (or via onTrack depending on WebRTC build).
         // We don't need to manually play it; the WebRTC stack will route to audio output.
-        onEvent(.systemNote("Received remote track."))
+        onEvent(.system("Received remote track."))
     }
 
     // Some WebRTC builds use this newer delegate callback:
     func peerConnection(_ peerConnection: RTCPeerConnection, didAdd rtpReceiver: RTCRtpReceiver, streams: [RTCMediaStream], transceiver: RTCRtpTransceiver) {
-        onEvent(.systemNote("Received remote track."))
+        onEvent(.system("Received remote track."))
     }
 }
 
@@ -371,7 +371,7 @@ extension OpenAIWebRTCSession: RTCPeerConnectionDelegate {
 extension OpenAIWebRTCSession: RTCDataChannelDelegate {
     func dataChannelDidChangeState(_ dataChannel: RTCDataChannel) {
         if dataChannel.readyState == .open {
-            onEvent(.systemNote("Events channel ready."))
+            onEvent(.system("Events channel ready."))
         }
     }
 

@@ -2,7 +2,9 @@ import Foundation
 
 enum RealtimeClientFactory {
     static func makeClient(
+        providerPreference: RealtimeProviderPreference = .openAI,
         modelPreference: RealtimeModelPreference = .realtimeMini,
+        geminiModelPreference: GeminiLiveModelPreference = .gemini25FlashNativeAudioPreview_2025_12,
         learnerContext: LearnerContext
     ) -> RealtimeSessionClient {
         if AppConfig.isUITesting {
@@ -14,7 +16,12 @@ enum RealtimeClientFactory {
         #if USE_MOCK_REALTIME
         return MockRealtimeSessionClient()
         #else
-        return OpenAIRealtimeWebRTCClient(modelPreference: modelPreference, learnerContext: learnerContext)
+        switch providerPreference {
+        case .openAI:
+            return OpenAIRealtimeWebRTCClient(modelPreference: modelPreference, learnerContext: learnerContext)
+        case .geminiLive:
+            return GeminiLiveWebSocketClient(modelPreference: geminiModelPreference, learnerContext: learnerContext)
+        }
         #endif
     }
 }

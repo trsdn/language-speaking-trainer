@@ -8,23 +8,63 @@ struct SettingsView: View {
     @FocusState private var isAgeFieldFocused: Bool
 
     @State private var openAIAPIKeyDraft: String = ""
+    @State private var googleAPIKeyDraft: String = ""
 
     var body: some View {
         Form {
             Section {
-                Picker("Realtime model", selection: $appModel.realtimeModelPreference) {
-                    ForEach(RealtimeModelPreference.allCases) { option in
+                Picker("Provider", selection: $appModel.realtimeProviderPreference) {
+                    ForEach(RealtimeProviderPreference.allCases) { option in
                         Text(option.displayName)
                             .tag(option)
                     }
                 }
                 .pickerStyle(.segmented)
 
-                Text("This changes which OpenAI Realtime model is used for new sessions.")
+                Text("Choose which realtime backend to use for new sessions.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             } header: {
-                Text("Realtime")
+                Text("Realtime provider")
+            }
+
+            Section {
+                if appModel.realtimeProviderPreference == .openAI {
+                    Picker("Realtime model", selection: $appModel.realtimeModelPreference) {
+                        ForEach(RealtimeModelPreference.allCases) { option in
+                            Text(option.displayName)
+                                .tag(option)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    Text("This changes which OpenAI Realtime model is used for new sessions.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Picker("Gemini Live model", selection: $appModel.geminiLiveModelPreference) {
+                        ForEach(GeminiLiveModelPreference.allCases) { option in
+                            Text(option.displayName)
+                                .tag(option)
+                        }
+                    }
+
+                    Text("This changes which Gemini Live model is used for new sessions.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("Model")
+            }
+
+            Section {
+                Toggle("Show system/debug messages", isOn: $appModel.showSystemMessages)
+
+                Text("When off, the session transcript hides diagnostics (but still shows errors). The \"Teacher ready\" indicator still works.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Session")
             }
 
             Section {
@@ -82,47 +122,92 @@ struct SettingsView: View {
                 Text("Learner")
             }
 
-            Section {
-                if appModel.hasOpenAIAPIKey {
-                    LabeledContent("API key") {
-                        Text("Saved")
-                            .foregroundStyle(.secondary)
+            if appModel.realtimeProviderPreference == .openAI {
+                Section {
+                    if appModel.hasOpenAIAPIKey {
+                        LabeledContent("API key") {
+                            Text("Saved")
+                                .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        LabeledContent("API key") {
+                            Text("Not set")
+                                .foregroundStyle(.secondary)
+                        }
                     }
-                } else {
-                    LabeledContent("API key") {
-                        Text("Not set")
-                            .foregroundStyle(.secondary)
+
+                    SecureField(appModel.hasOpenAIAPIKey ? "Enter new OpenAI API key" : "Enter OpenAI API key", text: $openAIAPIKeyDraft)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .textContentType(.password)
+
+                    HStack {
+                        Button("Save") {
+                            appModel.storeOpenAIAPIKey(openAIAPIKeyDraft)
+                            openAIAPIKeyDraft = ""
+                        }
+                        .disabled(openAIAPIKeyDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                        Spacer()
+
+                        Button("Clear", role: .destructive) {
+                            appModel.clearOpenAIAPIKey()
+                            openAIAPIKeyDraft = ""
+                        }
+                        .disabled(!appModel.hasOpenAIAPIKey)
                     }
+
+                    Text("For safety, the stored key cannot be displayed again. To change it, enter a new value and tap Save.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text("OpenAI (BYOK)")
+                } footer: {
+                    Text("Dev/personal use only: storing an API key on-device can be risky. If a key is set here, the app will mint Realtime client secrets directly from OpenAI.")
                 }
-
-                SecureField(appModel.hasOpenAIAPIKey ? "Enter new OpenAI API key" : "Enter OpenAI API key", text: $openAIAPIKeyDraft)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .textContentType(.password)
-
-                HStack {
-                    Button("Save") {
-                        appModel.storeOpenAIAPIKey(openAIAPIKeyDraft)
-                        openAIAPIKeyDraft = ""
+            } else {
+                Section {
+                    if appModel.hasGoogleAPIKey {
+                        LabeledContent("API key") {
+                            Text("Saved")
+                                .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        LabeledContent("API key") {
+                            Text("Not set")
+                                .foregroundStyle(.secondary)
+                        }
                     }
-                    .disabled(openAIAPIKeyDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 
-                    Spacer()
+                    SecureField(appModel.hasGoogleAPIKey ? "Enter new Google API key" : "Enter Google API key", text: $googleAPIKeyDraft)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .textContentType(.password)
 
-                    Button("Clear", role: .destructive) {
-                        appModel.clearOpenAIAPIKey()
-                        openAIAPIKeyDraft = ""
+                    HStack {
+                        Button("Save") {
+                            appModel.storeGoogleAPIKey(googleAPIKeyDraft)
+                            googleAPIKeyDraft = ""
+                        }
+                        .disabled(googleAPIKeyDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                        Spacer()
+
+                        Button("Clear", role: .destructive) {
+                            appModel.clearGoogleAPIKey()
+                            googleAPIKeyDraft = ""
+                        }
+                        .disabled(!appModel.hasGoogleAPIKey)
                     }
-                    .disabled(!appModel.hasOpenAIAPIKey)
+
+                    Text("For safety, the stored key cannot be displayed again. To change it, enter a new value and tap Save.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text("Google (Gemini Live BYOK)")
+                } footer: {
+                    Text("Dev/personal use only: storing an API key on-device can be risky. For broader distribution, prefer server-minted ephemeral tokens.")
                 }
-
-                Text("For safety, the stored key cannot be displayed again. To change it, enter a new value and tap Save.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            } header: {
-                Text("OpenAI (BYOK)")
-            } footer: {
-                Text("Dev/personal use only: storing an API key on-device can be risky. If a key is set here, the app will mint Realtime client secrets directly from OpenAI.")
             }
         }
         .navigationTitle("Settings")

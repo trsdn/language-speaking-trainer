@@ -3,7 +3,10 @@ import UIKit
 
 struct SessionView: View {
     let topic: Topic
+    let providerPreference: RealtimeProviderPreference
     let modelPreference: RealtimeModelPreference
+    let geminiModelPreference: GeminiLiveModelPreference
+    let showSystemMessages: Bool
     let learnerContext: LearnerContext
 
     @Environment(\.dismiss) private var dismiss
@@ -13,12 +16,28 @@ struct SessionView: View {
 
     @State private var isMuted: Bool = false
 
-    init(topic: Topic, modelPreference: RealtimeModelPreference, learnerContext: LearnerContext) {
+    init(
+        topic: Topic,
+        providerPreference: RealtimeProviderPreference,
+        modelPreference: RealtimeModelPreference,
+        geminiModelPreference: GeminiLiveModelPreference,
+        showSystemMessages: Bool,
+        learnerContext: LearnerContext
+    ) {
         self.topic = topic
+        self.providerPreference = providerPreference
         self.modelPreference = modelPreference
+        self.geminiModelPreference = geminiModelPreference
+        self.showSystemMessages = showSystemMessages
         self.learnerContext = learnerContext
         _sessionModel = StateObject(wrappedValue: SessionModel(
-            client: RealtimeClientFactory.makeClient(modelPreference: modelPreference, learnerContext: learnerContext)
+            client: RealtimeClientFactory.makeClient(
+                providerPreference: providerPreference,
+                modelPreference: modelPreference,
+                geminiModelPreference: geminiModelPreference,
+                learnerContext: learnerContext
+            ),
+            showSystemMessages: showSystemMessages
         ))
     }
 
@@ -41,8 +60,6 @@ struct SessionView: View {
                 MicActivityView(level: mic.level, isMuted: isMuted)
                     .frame(width: 72, height: 72)
             }
-
-            transcript
 
             HStack(spacing: 12) {
                 Button {
@@ -81,6 +98,23 @@ struct SessionView: View {
         }
         .padding(.horizontal)
         .navigationBarTitleDisplayMode(.inline)
+        .alert(
+            "Error",
+            isPresented: Binding(
+                get: { sessionModel.latestErrorMessage != nil },
+                set: { presented in
+                    if !presented {
+                        sessionModel.clearLatestError()
+                    }
+                }
+            )
+        ) {
+            Button("OK", role: .cancel) {
+                sessionModel.clearLatestError()
+            }
+        } message: {
+            Text(sessionModel.latestErrorMessage ?? "")
+        }
         .onAppear {
             sessionModel.start(topic: topic)
 
@@ -95,27 +129,6 @@ struct SessionView: View {
         .onDisappear {
             sessionModel.stop()
             mic.stop()
-        }
-    }
-
-    private var transcript: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 10) {
-                ForEach(sessionModel.messages) { msg in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(msg.roleLabel)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                        Text(msg.text)
-                            .font(.body)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-                    .background(.thinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                }
-            }
-            .padding(.vertical, 8)
         }
     }
 

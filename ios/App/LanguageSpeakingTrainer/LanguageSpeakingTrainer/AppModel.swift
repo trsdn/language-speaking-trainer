@@ -17,6 +17,46 @@ enum RealtimeModelPreference: String, CaseIterable, Codable, Identifiable {
     }
 }
 
+enum RealtimeProviderPreference: String, CaseIterable, Codable, Identifiable {
+    case openAI
+    case geminiLive
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .openAI:
+            return "OpenAI Realtime"
+        case .geminiLive:
+            return "Gemini Live"
+        }
+    }
+}
+
+enum GeminiLiveModelPreference: String, CaseIterable, Codable, Identifiable {
+    /// Gemini 2.5 Flash with native audio (Live preview).
+    case gemini25FlashNativeAudioPreview_2025_12 = "gemini-2.5-flash-native-audio-preview-12-2025"
+
+    /// Older/alternate Live preview identifier seen in docs/examples.
+    case geminiLive25FlashPreview = "gemini-live-2.5-flash-preview"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .gemini25FlashNativeAudioPreview_2025_12:
+            return "Gemini 2.5 Flash (native audio preview)"
+        case .geminiLive25FlashPreview:
+            return "Gemini Live 2.5 Flash (preview)"
+        }
+    }
+
+    /// Full model resource name required by the Live API setup message.
+    var resourceName: String {
+        "models/\(rawValue)"
+    }
+}
+
 enum SchoolType: String, CaseIterable, Codable, Identifiable {
     case kindergarten
     case primarySchool
@@ -264,15 +304,51 @@ final class AppModel: ObservableObject {
     }
 
     // Settings
+    @Published var realtimeProviderPreference: RealtimeProviderPreference {
+        didSet {
+            persistRealtimeProviderPreference(realtimeProviderPreference)
+        }
+    }
+
     @Published var realtimeModelPreference: RealtimeModelPreference {
         didSet {
             persistRealtimeModelPreference(realtimeModelPreference)
         }
     }
 
+    @Published var geminiLiveModelPreference: GeminiLiveModelPreference {
+        didSet {
+            persistGeminiLiveModelPreference(geminiLiveModelPreference)
+        }
+    }
+
+    /// Whether to show system/debug notes in the session transcript.
+    ///
+    /// When disabled, the session screen becomes much quieter (you still get the
+    /// "Teacher ready" indicator). If something doesn't work, turn this back on
+    /// to see connection diagnostics and errors.
+    @Published var showSystemMessages: Bool {
+        didSet {
+            persistShowSystemMessages(showSystemMessages)
+        }
+    }
+
+    /// Whether to show transcript text (teacher + user text) in the session UI.
+    ///
+    /// When disabled, the session becomes audio-first and much quieter visually.
+    @Published var showTranscript: Bool {
+        didSet {
+            persistShowTranscript(showTranscript)
+        }
+    }
+
     /// Whether an OpenAI API key is stored on this device (BYOK mode).
     /// We intentionally never expose the stored value via the UI.
     @Published private(set) var hasOpenAIAPIKey: Bool
+
+    /// Whether a Google API key is stored on this device (Gemini Live BYOK mode).
+    /// We intentionally never expose the stored value via the UI.
+    @Published private(set) var hasGoogleAPIKey: Bool
 
     @Published var learnerProfile: LearnerProfile {
         didSet {
@@ -299,12 +375,22 @@ final class AppModel: ObservableObject {
         initialOnboarding.save()
 
         let initialRealtimePref = Self.loadRealtimeModelPreference()
+        let initialProviderPref = Self.loadRealtimeProviderPreference()
+        let initialGeminiModelPref = Self.loadGeminiLiveModelPreference()
+        let initialShowSystemMessages = Self.loadShowSystemMessages()
+        let initialShowTranscript = Self.loadShowTranscript()
         let initialLearnerProfile = LearnerProfile.load()
         let initialHasOpenAIKey = Self.loadHasOpenAIAPIKey()
+        let initialHasGoogleKey = Self.loadHasGoogleAPIKey()
 
         onboarding = initialOnboarding
+        realtimeProviderPreference = initialProviderPref
         realtimeModelPreference = initialRealtimePref
+        geminiLiveModelPreference = initialGeminiModelPref
+        showSystemMessages = initialShowSystemMessages
+        showTranscript = initialShowTranscript
         hasOpenAIAPIKey = initialHasOpenAIKey
+        hasGoogleAPIKey = initialHasGoogleKey
         learnerProfile = initialLearnerProfile
     }
 
@@ -312,11 +398,16 @@ final class AppModel: ObservableObject {
         let defaults = UserDefaults.standard
         defaults.removeObject(forKey: OnboardingSettings.storageKey)
         defaults.removeObject(forKey: LearnerProfile.storageKey)
+        defaults.removeObject(forKey: realtimeProviderPreferenceKey)
         defaults.removeObject(forKey: realtimeModelPreferenceKey)
+        defaults.removeObject(forKey: geminiLiveModelPreferenceKey)
+        defaults.removeObject(forKey: showSystemMessagesKey)
+        defaults.removeObject(forKey: showTranscriptKey)
         defaults.synchronize()
 
         // Best-effort: also clear Keychain secrets so UITests don't leak state between runs.
         try? KeychainStore.delete(.openAIAPIKey)
+        try? KeychainStore.delete(.googleAPIKey)
     }
 
     var learnerContext: LearnerContext {
@@ -349,6 +440,21 @@ final class AppModel: ObservableObject {
     }
 
     private static let realtimeModelPreferenceKey = "realtime.model.preference.v1"
+    private static let realtimeProviderPreferenceKey = "realtime.provider.preference.v1"
+    private static let geminiLiveModelPreferenceKey = "gemini.live.model.preference.v1"
+    private static let showSystemMessagesKey = "session.showSystemMessages.v1"
+    private static let showTranscriptKey = "session.showTranscript.v1"
+
+    private static func loadRealtimeProviderPreference() -> RealtimeProviderPreference {
+        guard let raw = UserDefaults.standard.string(forKey: realtimeProviderPreferenceKey) else {
+            return .openAI
+        }
+        return RealtimeProviderPreference(rawValue: raw) ?? .openAI
+    }
+
+    private func persistRealtimeProviderPreference(_ pref: RealtimeProviderPreference) {
+        UserDefaults.standard.set(pref.rawValue, forKey: Self.realtimeProviderPreferenceKey)
+    }
 
     private static func loadRealtimeModelPreference() -> RealtimeModelPreference {
         guard let raw = UserDefaults.standard.string(forKey: realtimeModelPreferenceKey) else {
@@ -361,8 +467,48 @@ final class AppModel: ObservableObject {
         UserDefaults.standard.set(pref.rawValue, forKey: Self.realtimeModelPreferenceKey)
     }
 
+    private static func loadGeminiLiveModelPreference() -> GeminiLiveModelPreference {
+        guard let raw = UserDefaults.standard.string(forKey: geminiLiveModelPreferenceKey) else {
+            return .gemini25FlashNativeAudioPreview_2025_12
+        }
+        return GeminiLiveModelPreference(rawValue: raw) ?? .gemini25FlashNativeAudioPreview_2025_12
+    }
+
+    private func persistGeminiLiveModelPreference(_ pref: GeminiLiveModelPreference) {
+        UserDefaults.standard.set(pref.rawValue, forKey: Self.geminiLiveModelPreferenceKey)
+    }
+
+    private static func loadShowSystemMessages() -> Bool {
+        // Default is "true" to preserve current behavior.
+        if UserDefaults.standard.object(forKey: showSystemMessagesKey) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: showSystemMessagesKey)
+    }
+
+    private func persistShowSystemMessages(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: Self.showSystemMessagesKey)
+    }
+
+    private static func loadShowTranscript() -> Bool {
+        // Default is "true" to preserve current behavior.
+        if UserDefaults.standard.object(forKey: showTranscriptKey) == nil {
+            return true
+        }
+        return UserDefaults.standard.bool(forKey: showTranscriptKey)
+    }
+
+    private func persistShowTranscript(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: Self.showTranscriptKey)
+    }
+
     private static func loadHasOpenAIAPIKey() -> Bool {
         let v = KeychainStore.readString(for: .openAIAPIKey)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return !v.isEmpty
+    }
+
+    private static func loadHasGoogleAPIKey() -> Bool {
+        let v = KeychainStore.readString(for: .googleAPIKey)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return !v.isEmpty
     }
 
@@ -384,6 +530,26 @@ final class AppModel: ObservableObject {
             // Ignore failures; we still recompute.
         }
         hasOpenAIAPIKey = Self.loadHasOpenAIAPIKey()
+    }
+
+    func storeGoogleAPIKey(_ apiKey: String) {
+        let v = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !v.isEmpty else { return }
+        do {
+            try KeychainStore.writeString(v, for: .googleAPIKey)
+            hasGoogleAPIKey = true
+        } catch {
+            // Intentionally do not log the key.
+        }
+    }
+
+    func clearGoogleAPIKey() {
+        do {
+            try KeychainStore.delete(.googleAPIKey)
+        } catch {
+            // Ignore failures; we still recompute.
+        }
+        hasGoogleAPIKey = Self.loadHasGoogleAPIKey()
     }
 }
 

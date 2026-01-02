@@ -46,26 +46,43 @@ final class MicrophoneMonitor: ObservableObject {
     }
 
     private func requestPermissionIfNeeded() async -> Bool {
-        switch AVAudioSession.sharedInstance().recordPermission {
-        case .granted:
-            return true
-        case .denied:
-            return false
-        case .undetermined:
-            return await withCheckedContinuation { cont in
-                AVAudioSession.sharedInstance().requestRecordPermission { granted in
-                    cont.resume(returning: granted)
+        if #available(iOS 17.0, *) {
+            switch AVAudioApplication.shared.recordPermission {
+            case .granted:
+                return true
+            case .denied:
+                return false
+            case .undetermined:
+                return await withCheckedContinuation { cont in
+                    AVAudioApplication.requestRecordPermission { granted in
+                        cont.resume(returning: granted)
+                    }
                 }
+            @unknown default:
+                return false
             }
-        @unknown default:
-            return false
+        } else {
+            switch AVAudioSession.sharedInstance().recordPermission {
+            case .granted:
+                return true
+            case .denied:
+                return false
+            case .undetermined:
+                return await withCheckedContinuation { cont in
+                    AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                        cont.resume(returning: granted)
+                    }
+                }
+            @unknown default:
+                return false
+            }
         }
     }
 
     private func startEngineIfNeeded() {
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetooth])
+            try session.setCategory(.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothHFP])
             try session.setActive(true)
 
             let input = engine.inputNode

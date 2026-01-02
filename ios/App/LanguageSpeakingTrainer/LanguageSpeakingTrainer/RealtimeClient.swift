@@ -2,10 +2,25 @@ import Foundation
 
 // MARK: - Events
 
+enum SystemNoteKind: String, Codable {
+    case info
+    case error
+}
+
 enum RealtimeEvent {
     case connected
     case teacherMessage(String)
-    case systemNote(String)
+    case systemNote(String, kind: SystemNoteKind)
+}
+
+extension RealtimeEvent {
+    static func system(_ text: String) -> RealtimeEvent {
+        .systemNote(text, kind: .info)
+    }
+
+    static func error(_ text: String) -> RealtimeEvent {
+        .systemNote(text, kind: .error)
+    }
 }
 
 // MARK: - Protocol
@@ -41,7 +56,7 @@ final class MockRealtimeSessionClient: RealtimeSessionClient {
             onEvent(.teacherMessage("Hi! I’m your English teacher. Let’s talk about \(topic.title). What do you like about it?"))
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            onEvent(.systemNote("(Realtime/WebRTC not connected yet — this is a mock.)"))
+            onEvent(.system("(Realtime/WebRTC not connected yet — this is a mock.)"))
         }
     }
 

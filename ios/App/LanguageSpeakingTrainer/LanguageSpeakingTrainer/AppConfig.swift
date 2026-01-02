@@ -32,5 +32,28 @@ enum AppConfig {
 
         return nil
     }
+
+    /// Google API key used for Gemini Live API (BYOK / dev-only).
+    ///
+    /// Important: do not ship a production app that relies on a user-entered API key.
+    /// Prefer server-minted ephemeral tokens for broad distribution.
+    static var googleAPIKey: String? {
+        // App override (stored securely). Never surface this in UI.
+        if let v = KeychainStore.readString(for: .googleAPIKey)?.trimmingCharacters(in: .whitespacesAndNewlines), !v.isEmpty {
+            return v
+        }
+
+        // Dev convenience: allow setting via Xcode Scheme env vars.
+        for envKey in ["GOOGLE_API_KEY", "GEMINI_API_KEY"] {
+            if let env = ProcessInfo.processInfo.environment[envKey] {
+                let v = env.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !v.isEmpty {
+                    return v
+                }
+            }
+        }
+
+        return nil
+    }
 }
 

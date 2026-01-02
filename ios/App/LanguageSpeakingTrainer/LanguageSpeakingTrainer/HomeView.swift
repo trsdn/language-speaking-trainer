@@ -58,7 +58,10 @@ struct HomeView: View {
             NavigationLink {
                 SessionView(
                     topic: appModel.selectedTopic ?? Topic.presets[0],
+                    providerPreference: appModel.realtimeProviderPreference,
                     modelPreference: appModel.realtimeModelPreference,
+                    geminiModelPreference: appModel.geminiLiveModelPreference,
+                    showSystemMessages: appModel.showSystemMessages,
                     learnerContext: appModel.learnerContext
                 )
             } label: {
