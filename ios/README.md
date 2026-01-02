@@ -32,6 +32,16 @@ Optional (for later Realtime token minting):
 - `TOKEN_SERVICE_BASE_URL`: `https://your-vercel-app.vercel.app`
 - `TOKEN_SERVICE_SHARED_SECRET`: a shared secret that the backend requires on `/api/realtime/token`
 
+Alternative (dev/personal use): **BYOK (Bring Your Own Key)**
+
+- You can enter an **OpenAI API key directly in the app** under **Settings → OpenAI (BYOK)**.
+- The key is stored in the **Keychain** and is **write-only** from the UI (it cannot be displayed again after saving).
+- When a BYOK key is set, the app will mint Realtime client secrets **directly from OpenAI** and does **not** require the Vercel token service.
+
+Security warning:
+
+- Storing an API key on-device is risky and not suitable for a public/shipped app. Treat BYOK as a personal/dev convenience only.
+
 How to set these (recommended for local dev):
 
 1. In Xcode, select the app scheme → **Edit Scheme…**

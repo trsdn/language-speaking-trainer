@@ -267,19 +267,6 @@
 		};
 /* End PBXShellScriptBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		27A0C0C72F4D4B8B00A22221 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 210056432EFB1FFA005133E6 /* LanguageSpeakingTrainer */;
-			targetProxy = 27A0C0C72F4D4B8B00A11111 /* PBXContainerItemProxy */;
-		};
-		27A0C0C72F4D4B8B00A22222 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 210056432EFB1FFA005133E6 /* LanguageSpeakingTrainer */;
-			targetProxy = 27A0C0C72F4D4B8B00A11112 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXSourcesBuildPhase section */
 		210056402EFB1FFA005133E6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -303,6 +290,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		27A0C0C72F4D4B8B00A22221 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 210056432EFB1FFA005133E6 /* LanguageSpeakingTrainer */;
+			targetProxy = 27A0C0C72F4D4B8B00A11111 /* PBXContainerItemProxy */;
+		};
+		27A0C0C72F4D4B8B00A22222 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 210056432EFB1FFA005133E6 /* LanguageSpeakingTrainer */;
+			targetProxy = 27A0C0C72F4D4B8B00A11112 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		2100564D2EFB1FFC005133E6 /* Debug */ = {
